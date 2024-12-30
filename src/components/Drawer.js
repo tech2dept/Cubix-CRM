@@ -9,6 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import CallIcon from "@mui/icons-material/Call";
+import { AiOutlinePhone } from "react-icons/ai";
 import EmailIcon from "@mui/icons-material/Email";
 import LanguageIcon from "@mui/icons-material/Language";
 import RateReviewIcon from "@mui/icons-material/RateReview";
@@ -17,6 +18,11 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { format } from "date-fns";
 import whatsapp from "../utils/whatsapp.png";
 import ScheduleActivityPopup from "../modals/ScheduleActivityModal";
+import phone from '../utils/phone.png'
+// import HistoryDisplay from "./HistoryDisplay";
+import { Box, Tab } from "@mui/material";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const Drawer = ({
   showDrawer,
@@ -25,6 +31,7 @@ const Drawer = ({
   handleInputChange,
   handleSave,
   stageMapping,
+  leadsWithHistory
 }) => {
   const leadSourceMapping = {
     walkIn: "Walk-in",
@@ -82,6 +89,17 @@ const Drawer = ({
     setActivitiesModal(true);
   };
 
+    const theme = createTheme({
+      typography: {
+        fontFamily: `'Figtree', sans-serif`,
+      },
+    });
+
+    const handleChange = (event, newValue) => {
+      setValue(newValue);
+    };
+
+     const [value, setValue] = useState("1");
   // const formattedDate = format(new Date(selectedLead.leadEntryTime), "MMMM do, yyyy 'at' h:mm a");
 
   return (
@@ -604,165 +622,139 @@ const Drawer = ({
             </div>
 
             {/* Activity Timeline */}
-            <div className="w-[60%] bg-white p-4 rounded-md shadow-md max-h-[80vh] overflow-y-scroll">
-              <h3 className="text-xl font-semibold mb-4">Activity</h3>
-              <ul className="space-y-6">
-                {[
-                  {
-                    type: "website",
-                    description: "https://www.mikesmechanical.com/service",
-                    date: "00:01:30",
-                  },
-                  {
-                    type: "website",
-                    description: "https://www.mikesmechanical.com/get-a-quote",
-                    date: "00:01:30",
-                  },
-                  {
-                    type: "phone",
-                    description: "Called Main Office (Open Call)",
-                    date: "",
-                  },
-                  {
-                    type: "phone",
-                    description: "Called Mike Office (Open Call)",
-                    date: "",
-                  },
-                  {
-                    type: "form",
-                    description: "Small Engine Repair near me",
-                    date: "",
-                  },
-                  {
-                    type: "phone",
-                    description: "Called Jeff Mobile (Open Call)",
-                    date: "",
-                  },
-                  {
-                    type: "email",
-                    description: "Request Feedback",
-                    date: "",
-                  },
-                  {
-                    type: "review",
-                    description: "Feedback Received (Open Review)",
-                    date: "",
-                  },
-                  {
-                    type: "website",
-                    description: "https://www.mikesmechanical.com/service",
-                    date: "00:01:30",
-                  },
-                  {
-                    type: "website",
-                    description: "https://www.mikesmechanical.com/get-a-quote",
-                    date: "00:01:30",
-                  },
-                  {
-                    type: "phone",
-                    description: "Called Main Office (Open Call)",
-                    date: "",
-                  },
-                  {
-                    type: "phone",
-                    description: "Called Mike Office (Open Call)",
-                    date: "",
-                  },
-                  {
-                    type: "form",
-                    description: "Small Engine Repair near me",
-                    date: "",
-                  },
-                  {
-                    type: "phone",
-                    description: "Called Jeff Mobile (Open Call)",
-                    date: "",
-                  },
-                  {
-                    type: "email",
-                    description: "Request Feedback",
-                    date: "",
-                  },
-                  {
-                    type: "review",
-                    description: "Feedback Received (Open Review)",
-                    date: "",
-                  },
-                  {
-                    type: "website",
-                    description: "https://www.mikesmechanical.com/service",
-                    date: "00:01:30",
-                  },
-                  {
-                    type: "website",
-                    description: "https://www.mikesmechanical.com/get-a-quote",
-                    date: "00:01:30",
-                  },
-                  {
-                    type: "phone",
-                    description: "Called Main Office (Open Call)",
-                    date: "",
-                  },
-                  {
-                    type: "phone",
-                    description: "Called Mike Office (Open Call)",
-                    date: "",
-                  },
-                  {
-                    type: "form",
-                    description: "Small Engine Repair near me",
-                    date: "",
-                  },
-                  {
-                    type: "phone",
-                    description: "Called Jeff Mobile (Open Call)",
-                    date: "",
-                  },
-                  {
-                    type: "email",
-                    description: "Request Feedback",
-                    date: "",
-                  },
-                  {
-                    type: "review",
-                    description: "Feedback Received (Open Review)",
-                    date: "",
-                  },
-                ].map((activity, index) => (
-                  <li key={index} className="flex items-start space-x-4">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        activity.type === "phone"
-                          ? "bg-blue-100 text-blue-500"
-                          : activity.type === "email"
-                          ? "bg-green-100 text-green-500"
-                          : activity.type === "website"
-                          ? "bg-purple-100 text-purple-500"
-                          : activity.type === "form"
-                          ? "bg-orange-100 text-orange-500"
-                          : activity.type === "review"
-                          ? "bg-yellow-100 text-yellow-500"
-                          : "bg-gray-100 text-gray-500"
-                      }`}
-                    >
-                      {activity.type === "phone" && <CallIcon />}
-                      {activity.type === "email" && <EmailIcon />}
-                      {activity.type === "website" && <LanguageIcon />}
-                      {activity.type === "form" && <RateReviewIcon />}
-                      {activity.type === "review" && <RateReviewIcon />}
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">
-                        {activity.description}
-                      </p>
-                      {activity.date && (
-                        <p className="text-xs text-gray-500">{activity.date}</p>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+
+
+
+      {/* <div> */}
+        {/* <h1 className="text-2xl font-bold">Lead History</h1> */}
+        {/* <HistoryDisplay history={selectedLead.leadHistory} /> */}
+        {/* <HistoryDisplay history={selectedLead.leadHistory} /> */}
+        {/* <HistoryDisplay leadsWithHistory={leadsWithHistory} /> */}
+      {/* </div>  */}
+
+
+{/* Activity Timeline */}
+{/* <div> */}
+<div className="w-[60%] bg-white p-4 rounded-md shadow-md max-h-[80vh] overflow-y-scroll">
+      <ThemeProvider theme={theme}>
+        <TabContext value={value}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <TabList onChange={handleChange} aria-label="">
+              <Tab label="Lead Timeline" value="1" />
+              <Tab label="Activity Log" value="2" />
+            </TabList>
+          </Box>
+
+          <TabPanel sx={{ padding: 0 }} value="2">
+  <h3 className="text-xl font-semibold my-4">Activity Log</h3>
+
+  {/* Today Section */}
+  <div>
+    <h4 className="text-lg font-bold text-gray-700 mb-2">Today</h4>
+    <ul className="space-y-4">
+      {leadsWithHistory
+        .filter((entry) => {
+          const today = new Date();
+          const entryDate = new Date(entry.date);
+          return (
+            today.toDateString() === entryDate.toDateString()
+          ); // Filter for today's entries
+        })
+        .map((activity, index) => (
+          <li key={index} className="flex items-start space-x-4">
+            {/* Time */}
+            <div className="text-sm text-gray-500 w-20">
+              {new Date(activity.date).toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </div>
+
+            {/* Content */}
+            <div className="flex-1">
+              <p className="text-sm font-medium mb-1">
+                {activity.activity}{" "}
+                <span
+                  className="px-2 py-1 rounded-full text-xs font-normal text-white flex items-center gap-1"
+                  style={{
+                    backgroundColor:
+                      activity.tag === "Underwriting"
+                        ? "#de85f"
+                        : activity.tag === "Requirement Closed"
+                        ? "#28A745"
+                        : "#FFC107",
+                  }}
+                >
+                  {activity.tag || "General"}
+                </span>
+              </p>
+              <p className="text-xs text-gray-500">{activity.note}</p>
+            </div>
+          </li>
+        ))}
+    </ul>
+  </div>
+
+  {/* Divider */}
+  <hr className="my-4 border-gray-300" />
+
+  {/* Yesterday Section */}
+  <div>
+    <h4 className="text-lg font-bold text-gray-700 mb-2">Yesterday</h4>
+    <ul className="space-y-4">
+      {leadsWithHistory
+        .filter((entry) => {
+          const today = new Date();
+          const yesterday = new Date();
+          yesterday.setDate(today.getDate() - 1);
+          const entryDate = new Date(entry.date);
+          return (
+            yesterday.toDateString() === entryDate.toDateString()
+          ); // Filter for yesterday's entries
+        })
+        .map((activity, index) => (
+          <li key={index} className="flex items-start space-x-4">
+            {/* Time */}
+            <div className="text-sm text-gray-500 w-20">
+              {new Date(activity.date).toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </div>
+
+            {/* Content */}
+            <div className="flex-1">
+              <p className="text-sm font-medium mb-1">
+                {activity.activity}{" "}
+                <span
+                  className="px-2 py-1 rounded-full text-xs font-semibold text-white"
+                  style={{
+                    backgroundColor:
+                      activity.tag === "Requirement Pending"
+                        ? "#FFC107"
+                        : "#17A2B8",
+                  }}
+                >
+                  {activity.tag || "General"}
+                </span>
+              </p>
+              <p className="text-xs text-gray-500">{activity.note}</p>
+            </div>
+          </li>
+        ))}
+    </ul>
+  </div>
+</TabPanel>
+          <TabPanel value="1">
+  <h3 className="text-xl font-semibold mb-4">Lead Timeline</h3>
+
+            {/* <AllEntriesForm onFormSubmit={handleFormSubmit} /> */}
+          </TabPanel>
+        </TabContext>
+      </ThemeProvider>
+</div>
+
+
           </div>
         </>
       ) : (

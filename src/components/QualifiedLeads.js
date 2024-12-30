@@ -24,6 +24,7 @@ import table from "../utils/table.png";
 import DiscoveryLeads from "./DiscoveryLeads";
 import WonLeads from "./WonLeads";
 import Drawer from "./Drawer";
+import HistoryDisplay from "./HistoryDisplay";
 
 const QualifiedLeads = () => {
   const [discoveryLeads, setDiscoveryLeads] = useState(
@@ -52,7 +53,8 @@ const QualifiedLeads = () => {
   const [showDrawer, setShowDrawer] = useState(false); // Drawer visibility state
   const [selectedLead, setSelectedLead] = useState(null); // Store selected lead for Drawer
   const [viewMode, setViewMode] = useState("Tabular"); // View mode state
-
+  const [history, setHistory] = useState([]); // State to track history of selected lead
+  
   const [rows, setRows] = useState(() => {
     const savedData = localStorage.getItem("qualifiedLeads");
     return savedData ? JSON.parse(savedData) : [];
@@ -108,6 +110,37 @@ const QualifiedLeads = () => {
 
   const handleSave = (e) => {
     e.preventDefault();
+
+      // Loop through the fields of selectedLead to detect changes
+  const updatedLead = { ...selectedLead };
+  let isChanged = false; // Flag to track if any field has changed
+  const updatedHistory = updatedLead.history || []; // Ensure history exists
+
+  // Compare fields and add changes to history
+  Object.keys(updatedLead).forEach((field) => {
+    const oldValue = qualifiedLeads.find((lead) => lead.id === selectedLead.id)[field];
+    const newValue = updatedLead[field];
+
+    if (oldValue !== newValue) {
+      // If the field has changed, add an activity to the history
+      updatedHistory.push({
+        date: new Date().toISOString(),
+        activity: `Field "${field}" updated`,
+        note: `Changed from "${oldValue}" to "${newValue}"`,
+      });
+
+      isChanged = true; // Set flag to true if any field has changed
+    }
+  });
+
+  // Only update history and save if there are changes
+  if (isChanged) {
+    updatedLead.history = updatedHistory;
+    setHistory(updatedHistory); // Update history state
+    console.log('updatedLead.history',updatedLead.history)
+  }
+
+
     const updatedLeads = qualifiedLeads.map((lead) =>
       lead.id === selectedLead.id ? selectedLead : lead
     );
@@ -125,6 +158,12 @@ const QualifiedLeads = () => {
     setShowStageModal(false);
   };
 
+
+  const handleEdit = (lead) => {
+    setSelectedLead(lead);
+    setHistory(lead.history || []); // Initialize history for the selected lead
+    setShowDrawer(true);
+  };
   // const updateStageToDiscovery = (leadId) => {
   //   // First, find the lead to update
   //   const leadToMove = rows.find((row) => row.id === leadId);
@@ -410,6 +449,7 @@ const QualifiedLeads = () => {
             selectedLead={selectedLead}
             handleInputChange={handleInputChange}
             handleSave={handleSave}
+            leadsWithHistory={history}
             stageMapping={stageMapping}
           />
 

@@ -29,6 +29,7 @@ const AllEntriesForm = ({ onFormSubmit }) => {
     location: "",//
     area: "",//
     leadEntryTime: "",
+    history: "",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -61,9 +62,16 @@ const AllEntriesForm = ({ onFormSubmit }) => {
     }
     
     const currentTimestamp = new Date().toISOString(); // Get the current timestamp
-    const formDataWithTimestamp = { ...formData, leadEntryTime: currentTimestamp };
+    // const formDataWithTimestamp = { ...formData, leadEntryTime: currentTimestamp };
+    const formDataWithTimestamp = { ...formData, leadEntryTime: currentTimestamp ,
+     history: [
+      {
+        date: currentTimestamp,
+        activity: "Lead created",
+      },
+    ], };
 
-    console.log("Form Data with Lead Entry Time: ", formDataWithTimestamp);
+    console.log("Form Data with Lead Entry Time and history: ", formDataWithTimestamp);
     
     onFormSubmit(formDataWithTimestamp);
     alert("Form Data Submitted Succesfully!");
@@ -349,27 +357,6 @@ const AllEntriesForm = ({ onFormSubmit }) => {
             </TextField>
           </div>
 
-          {/* <div className="mb-0">
-            <TextField
-              label="Lead Entry Date & Time"
-              name="leadEntryDateTime"
-              type="datetime-local"
-              value={formData.leadDateAndTimeEntry || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-              variant="standard"
-              id="datetime"
-              InputLabelProps={{
-                shrink: true, // Ensures the label doesn't overlap with the input
-              }}
-              sx={{
-                "& .MuiInputLabel-root": {
-                  fontFamily: "Figtree, sans-serif", // Apply Figtree font for the label
-                },
-              }}
-            />
-          </div> */}
 
           <div className="mb-0">
             <TextField
@@ -411,6 +398,7 @@ const AllEntriesForm = ({ onFormSubmit }) => {
       },
     }}
   >
+    <MenuItem value="AED">AED</MenuItem>
     <MenuItem value="USD">USD</MenuItem>
     <MenuItem value="EUR">EUR</MenuItem>
     <MenuItem value="GBP">GBP</MenuItem>
@@ -486,7 +474,6 @@ const AllEntriesForm = ({ onFormSubmit }) => {
                 },
               }}
             >
-              <MenuItem value="AED">United Arab Emirates</MenuItem>
               <MenuItem value="US">United States</MenuItem>
               <MenuItem value="UK">United Kingdom</MenuItem>
               <MenuItem value="IN">India</MenuItem>

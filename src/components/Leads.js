@@ -31,6 +31,34 @@ const Leads = () => {
   }, [rows]);
 
   const handleFormSubmit = (formData) => {
+  const existingLead = rows.find((row) => row.id === formData.id); // Find the existing lead by ID
+
+  const newHistory = [];
+
+  if (existingLead) {
+    // Compare each field and add to history if it has changed
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] !== existingLead[key]) {
+        newHistory.push({
+          date: new Date().toISOString(), // Record the timestamp
+          activity: `Field "${key}" updated`,
+          note: `Changed from "${existingLead[key]}" to "${formData[key]}"`,
+        });
+      }
+    });
+
+    // Update the existing lead with new data and updated history
+    const updatedLead = {
+      ...existingLead,
+      ...formData,
+      leadHistory: [...existingLead.leadHistory, ...newHistory], // Append new history entries
+    };
+
+    setRows(rows.map((row) => (row.id === formData.id ? updatedLead : row)));
+  } else {
+
+    
+
     const newRow = {
       // id: rows.length + 1, // Unique ID for each row
       id: formData.id, // Unique ID for each row
@@ -56,11 +84,13 @@ const Leads = () => {
       location: formData.location,
       area: formData.area,
       leadEntryTime: formData.leadEntryTime,
+      leadHistory: formData.history,
 
 
 
     };
     setRows([...rows, newRow]); // Add the new row to the table
+  };
   };
 
   const [viewMode, setViewMode] = useState("Tabular"); // View mode state

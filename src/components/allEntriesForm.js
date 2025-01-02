@@ -29,7 +29,7 @@ const AllEntriesForm = ({ onFormSubmit }) => {
     location: "",//
     area: "",//
     leadEntryTime: "",
-    history: "",
+    timeline: "",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -64,14 +64,14 @@ const AllEntriesForm = ({ onFormSubmit }) => {
     const currentTimestamp = new Date().toISOString(); // Get the current timestamp
     // const formDataWithTimestamp = { ...formData, leadEntryTime: currentTimestamp };
     const formDataWithTimestamp = { ...formData, leadEntryTime: currentTimestamp ,
-     history: [
+      timeline: [
       {
         date: currentTimestamp,
         activity: "Lead created",
       },
     ], };
 
-    console.log("Form Data with Lead Entry Time and history: ", formDataWithTimestamp);
+    console.log("Form Data with Lead Entry Time and timeline: ", formDataWithTimestamp);
     
     onFormSubmit(formDataWithTimestamp);
     alert("Form Data Submitted Succesfully!");

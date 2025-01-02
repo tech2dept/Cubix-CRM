@@ -48,6 +48,17 @@ const WonLeads = ({ rows, setRows }) => {
     
     <div className="py-6">
       <h2 className="text-xl mb-2">Won Leads</h2>
+      {/* {selectedRows.length>0 &&
+          <div className="mb-2">
+            <button
+            onClick={() => setShowDeleteModal(true)}
+            className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+            disabled={selectedLeads.length === 0}
+            >
+              Delete Selected
+            </button>
+          </div>
+            } */}
       <table className="table-auto w-[100%] border-collapse border border-gray-200">
         <thead className="bg-gray-100">
           <tr>

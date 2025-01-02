@@ -54,6 +54,7 @@ const QualifiedLeads = () => {
   const [selectedLead, setSelectedLead] = useState(null); // Store selected lead for Drawer
   const [viewMode, setViewMode] = useState("Tabular"); // View mode state
   const [history, setHistory] = useState([]); // State to track history of selected lead
+  // const [timeline, setTimeline] = useState([]); // State to track history of selected lead
   
   const [rows, setRows] = useState(() => {
     const savedData = localStorage.getItem("qualifiedLeads");
@@ -63,7 +64,9 @@ const QualifiedLeads = () => {
   useEffect(() => {
     localStorage.setItem("qualifiedLeads", JSON.stringify(qualifiedLeads)); // Save qualified leads to localStorage
   }, [qualifiedLeads]);
-
+  
+  // console.log('qualifiedLeads:',qualifiedLeads)
+  // setTimeline(qualifiedLeads)
   const stageMapping = {
     new: "New",
     discovery: "Discovery",
@@ -113,6 +116,9 @@ const QualifiedLeads = () => {
 
       // Loop through the fields of selectedLead to detect changes
   const updatedLead = { ...selectedLead };
+  // const leadTimeline = 
+
+
   let isChanged = false; // Flag to track if any field has changed
   const updatedHistory = updatedLead.history || []; // Ensure history exists
 
@@ -120,7 +126,6 @@ const QualifiedLeads = () => {
   Object.keys(updatedLead).forEach((field) => {
     const oldValue = qualifiedLeads.find((lead) => lead.id === selectedLead.id)[field];
     const newValue = updatedLead[field];
-
     if (oldValue !== newValue) {
       // If the field has changed, add an activity to the history
       updatedHistory.push({
@@ -337,15 +342,17 @@ const QualifiedLeads = () => {
         <KanbanViewQualified rows={rows} setRows={setRows} />
       ) : (
         <div>
+            {selectedLeads.length>0 &&
           <div className="mb-2">
             <button
-              onClick={() => setShowDeleteModal(true)}
-              className="bg-red-500 text-white px-4 py-2 rounded mr-2"
-              disabled={selectedLeads.length === 0}
+            onClick={() => setShowDeleteModal(true)}
+            className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+            disabled={selectedLeads.length === 0}
             >
               Delete Selected
             </button>
           </div>
+            }
           <table className="table-auto w-[100%] border-collapse border border-gray-200">
             <thead className="bg-gray-100">
               <tr>
@@ -425,7 +432,7 @@ const QualifiedLeads = () => {
                             : row.stage === "won"
                             ? "bg-green-400"
                             : row.stage === "lost"
-                            ? "bg-red-300"
+                            ? "bg-red-500"
                             : "bg-gray-300"
                         }`}
                       >
@@ -451,6 +458,7 @@ const QualifiedLeads = () => {
             handleSave={handleSave}
             leadsWithHistory={history}
             stageMapping={stageMapping}
+            // leadTimeline={selectedLead.leadTimeline}
           />
 
           {/* Delete Confirmation Modal */}

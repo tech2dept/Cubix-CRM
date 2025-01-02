@@ -18,11 +18,12 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { format } from "date-fns";
 import whatsapp from "../utils/whatsapp.png";
 import ScheduleActivityPopup from "../modals/ScheduleActivityModal";
-import phone from '../utils/phone.png'
-// import HistoryDisplay from "./HistoryDisplay";
+import phone from "../utils/phone.png";
+import HistoryDisplay from "./HistoryDisplay";
 import { Box, Tab } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import ActivityLog from "./ActivityLog";
 
 const Drawer = ({
   showDrawer,
@@ -31,7 +32,8 @@ const Drawer = ({
   handleInputChange,
   handleSave,
   stageMapping,
-  leadsWithHistory
+  leadsWithHistory,
+  leadTimeline,
 }) => {
   const leadSourceMapping = {
     walkIn: "Walk-in",
@@ -58,7 +60,6 @@ const Drawer = ({
     australia: "Australia",
     otherCountry: "Others",
   };
-
   const [activitiesModal, setActivitiesModal] = useState(false);
 
   const handlePriorityClick = (level) => {
@@ -89,17 +90,17 @@ const Drawer = ({
     setActivitiesModal(true);
   };
 
-    const theme = createTheme({
-      typography: {
-        fontFamily: `'Figtree', sans-serif`,
-      },
-    });
+  const theme = createTheme({
+    typography: {
+      fontFamily: `'Figtree', sans-serif`,
+    },
+  });
 
-    const handleChange = (event, newValue) => {
-      setValue(newValue);
-    };
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
-     const [value, setValue] = useState("1");
+  const [value, setValue] = useState("1");
   // const formattedDate = format(new Date(selectedLead.leadEntryTime), "MMMM do, yyyy 'at' h:mm a");
 
   return (
@@ -128,16 +129,17 @@ const Drawer = ({
 
             {/* Profile Details */}
             <div className="text-center">
-
               <h3 className="text-xl font-semibold">
                 {selectedLead.lead || "David Collins"}
               </h3>
               <p className="text-gray-500">
                 {/* Lead Created on: {formattedDate = format(new Date(selectedLead.leadEntryTime), "MMMM do, yyyy 'at' h:mm a");} */}
-                Lead Created on:  {format(new Date(selectedLead.leadEntryTime), "MMMM do, yyyy 'at' h:mm a")}
+                Lead Created on:{" "}
+                {format(
+                  new Date(selectedLead.leadEntryTime),
+                  "MMMM do, yyyy 'at' h:mm a"
+                )}
               </p>
-
-            
             </div>
 
             {/* Action Icons */}
@@ -172,7 +174,7 @@ const Drawer = ({
 
             {/* Contact Details */}
             <div className="text-center text-gray-500 space-y-1">
-                {/* Lead Created on: {selectedLead.leadEntryTime } */}
+              {/* Lead Created on: {selectedLead.leadEntryTime } */}
 
               <p className="text-gray-700 font-medium">
                 Phone: {selectedLead.phone || "(973) 401 1282"}
@@ -579,20 +581,19 @@ const Drawer = ({
                   />
                 </div>
 
-                {selectedLead.file ? 
-                
-                // console.log('selectedLead:',selectedLead)
-                (
-  <div className="mb-4">
-    <p className="text-gray-600">Uploaded File:</p>
-    <p className="text-blue-500 underline">
-      {/* {selectedLead.file.name || "No name available"} */}
-      {selectedLead.file.split("\\").pop()  || "No name available"}
-    </p>
-  </div>
-) : (
-  <p>No file uploaded</p>
-)}
+                {selectedLead.file ? (
+                  // console.log('selectedLead:',selectedLead)
+                  <div className="mb-4">
+                    <p className="text-gray-600">Uploaded File:</p>
+                    <p className="text-blue-500 underline">
+                      {/* {selectedLead.file.name || "No name available"} */}
+                      {selectedLead.file.split("\\").pop() ||
+                        "No name available"}
+                    </p>
+                  </div>
+                ) : (
+                  <p>No file uploaded</p>
+                )}
 
                 <div className="mb-4">
                   <TextField
@@ -621,155 +622,42 @@ const Drawer = ({
               </form>
             </div>
 
+
+
             {/* Activity Timeline */}
-
-
-
-      {/* <div> */}
-        {/* <h1 className="text-2xl font-bold">Lead History</h1> */}
-        {/* <HistoryDisplay history={selectedLead.leadHistory} /> */}
-        {/* <HistoryDisplay history={selectedLead.leadHistory} /> */}
-        {/* <HistoryDisplay leadsWithHistory={leadsWithHistory} /> */}
-      {/* </div>  */}
-
-
-{/* Activity Timeline */}
-{/* <div> */}
-<div className="w-[60%] bg-white p-4 rounded-md shadow-md max-h-[80vh] overflow-y-scroll">
-      <ThemeProvider theme={theme}>
-        <TabContext value={value}>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList onChange={handleChange} aria-label="">
-              <Tab label="Lead Timeline" value="1" />
-              <Tab label="Activity Log" value="2" />
-            </TabList>
-          </Box>
-
-          <TabPanel sx={{ padding: 0 }} value="2">
-  <h3 className="text-xl font-semibold my-4">Activity Log</h3>
-
-  {/* Today Section */}
-  <div>
-    <h4 className="text-lg font-bold text-gray-700 mb-2">Today</h4>
-    <ul className="space-y-4">
-      {leadsWithHistory
-        .filter((entry) => {
-          const today = new Date();
-          const entryDate = new Date(entry.date);
-          return (
-            today.toDateString() === entryDate.toDateString()
-          ); // Filter for today's entries
-        })
-        .map((activity, index) => (
-          <li key={index} className="flex items-start space-x-4">
-            {/* Time */}
-            <div className="text-sm text-gray-500 w-20">
-              {new Date(activity.date).toLocaleTimeString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+            <div className="w-[60%] bg-white p-4 rounded-md shadow-md max-h-[80vh] overflow-y-scroll">
+              <ThemeProvider theme={theme}>
+                <TabContext value={value}>
+                  <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                    <TabList onChange={handleChange} aria-label="">
+                      <Tab label="Lead Timeline" value="1" />
+                      <Tab label="Activity Log" value="2" />
+                    </TabList>
+                  </Box>
+                  <TabPanel sx={{ padding: 0 }} value="2">
+                  <ActivityLog leadsWithHistory={leadsWithHistory} />
+                  </TabPanel>
+                  <TabPanel value="1" sx={{ padding: 0 }} >
+                  <HistoryDisplay leadsWithHistory={leadsWithHistory} />
+                  </TabPanel>
+                </TabContext>
+              </ThemeProvider>
             </div>
-
-            {/* Content */}
-            <div className="flex-1">
-              <p className="text-sm font-medium mb-1">
-                {activity.activity}{" "}
-                <span
-                  className="px-2 py-1 rounded-full text-xs font-normal text-white flex items-center gap-1"
-                  style={{
-                    backgroundColor:
-                      activity.tag === "Underwriting"
-                        ? "#de85f"
-                        : activity.tag === "Requirement Closed"
-                        ? "#28A745"
-                        : "#FFC107",
-                  }}
-                >
-                  {activity.tag || "General"}
-                </span>
-              </p>
-              <p className="text-xs text-gray-500">{activity.note}</p>
-            </div>
-          </li>
-        ))}
-    </ul>
-  </div>
-
-  {/* Divider */}
-  <hr className="my-4 border-gray-300" />
-
-  {/* Yesterday Section */}
-  <div>
-    <h4 className="text-lg font-bold text-gray-700 mb-2">Yesterday</h4>
-    <ul className="space-y-4">
-      {leadsWithHistory
-        .filter((entry) => {
-          const today = new Date();
-          const yesterday = new Date();
-          yesterday.setDate(today.getDate() - 1);
-          const entryDate = new Date(entry.date);
-          return (
-            yesterday.toDateString() === entryDate.toDateString()
-          ); // Filter for yesterday's entries
-        })
-        .map((activity, index) => (
-          <li key={index} className="flex items-start space-x-4">
-            {/* Time */}
-            <div className="text-sm text-gray-500 w-20">
-              {new Date(activity.date).toLocaleTimeString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </div>
-
-            {/* Content */}
-            <div className="flex-1">
-              <p className="text-sm font-medium mb-1">
-                {activity.activity}{" "}
-                <span
-                  className="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                  style={{
-                    backgroundColor:
-                      activity.tag === "Requirement Pending"
-                        ? "#FFC107"
-                        : "#17A2B8",
-                  }}
-                >
-                  {activity.tag || "General"}
-                </span>
-              </p>
-              <p className="text-xs text-gray-500">{activity.note}</p>
-            </div>
-          </li>
-        ))}
-    </ul>
-  </div>
-</TabPanel>
-          <TabPanel value="1">
-  <h3 className="text-xl font-semibold mb-4">Lead Timeline</h3>
-
-            {/* <AllEntriesForm onFormSubmit={handleFormSubmit} /> */}
-          </TabPanel>
-        </TabContext>
-      </ThemeProvider>
-</div>
-
-
           </div>
         </>
       ) : (
         <p>No lead selected</p>
       )}
 
-{activitiesModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center ">
-    <div className="relative z-100">
-      <ScheduleActivityPopup />
+      {activitiesModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center ">
+          <div className="relative z-100">
+            <ScheduleActivityPopup />
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-)}
-</div>
-);
+  );
 };
 
 export default Drawer;

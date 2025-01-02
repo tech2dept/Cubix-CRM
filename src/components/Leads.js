@@ -51,7 +51,7 @@ const Leads = () => {
     const updatedLead = {
       ...existingLead,
       ...formData,
-      leadHistory: [...existingLead.leadHistory, ...newHistory], // Append new history entries
+      leadTimeline: [...existingLead.leadTimeline, ...newHistory], // Append new history entries
     };
 
     setRows(rows.map((row) => (row.id === formData.id ? updatedLead : row)));
@@ -84,7 +84,7 @@ const Leads = () => {
       location: formData.location,
       area: formData.area,
       leadEntryTime: formData.leadEntryTime,
-      leadHistory: formData.history,
+      leadTimeline: formData.timeline,
 
 
 

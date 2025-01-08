@@ -8,6 +8,8 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import ReactDOM from "react-dom";
+
 import CallIcon from "@mui/icons-material/Call";
 import { AiOutlinePhone } from "react-icons/ai";
 import EmailIcon from "@mui/icons-material/Email";
@@ -24,6 +26,8 @@ import { Box, Tab } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import ActivityLog from "./ActivityLog";
+import EscalateLead from "../modals/EscalateLead";
+import ProductsDetails from "./ProductsDetails";
 
 const Drawer = ({
   showDrawer,
@@ -33,8 +37,25 @@ const Drawer = ({
   handleSave,
   stageMapping,
   leadsWithHistory,
-  leadTimeline,
+  rows,
+  setRows,
 }) => {
+ console.log("selectedLead in drawer:", selectedLead);
+//  console.log("selectedLead in drawer:", selectedLead?.leadItemCode);
+ 
+ 
+ const productDetails = [{
+   leadItemCode:selectedLead?.leadItemCode,
+   leadItemAmount:selectedLead?.leadItemAmount,
+   leadItemCurrentStock:selectedLead?.leadItemCurrentStock,
+   leadItemDescription:selectedLead?.leadItemDescription,
+   leadItemPrice:selectedLead?.leadItemPrice,
+   leadItemQuantity:selectedLead?.leadItemQuantity,
+   leadItemUnit:selectedLead?.leadItemUnit,
+  }]
+  console.log("productDetails in drawer:", productDetails);
+  // console.log("rows in drawer:", rows);
+
   const leadSourceMapping = {
     walkIn: "Walk-in",
     phone: "Phone",
@@ -61,33 +82,49 @@ const Drawer = ({
     otherCountry: "Others",
   };
   const [activitiesModal, setActivitiesModal] = useState(false);
+  const [escalateModal, setEscalateModal] = useState(false);
 
+  const handleClose = () => setActivitiesModal(false);
+  const handleCloseEscalate = () => setEscalateModal(false);
   const handlePriorityClick = (level) => {
     // setFormData({ ...selectedLead, priority: level });
   };
 
-  // Attach File
-  // const handleInputChange = (event, field, value) => {
-  //   const { type, files } = event.target;
 
-  //   const newValue = type === "file" ? files[0] : value !== undefined ? value : event.target.value;
+  const [showProducts, setShowProducts] = useState(false);
 
-  //   setSelectedLead((prevLead) => ({
-  //     ...prevLead,
-  //     [field]: newValue,
-  //   }));
-  // };
 
-  // const handleInputChange = (event, field, value) => {
-  //   const newValue = value !== undefined ? value : event.target.value;
-  //     setSelectedLead((prevLead) => ({
-  //       ...prevLead,
-  //       [field]: newValue,
-  //     }));
-  // };
 
-  const onActivities = () => {
+  const [currentLead, setCurrentLead] = useState(null);
+  const [currentLeadEscalate, setCurrentLeadEscalate] = useState(null);
+console.log('currentLead::',currentLead)
+  const onActivities = (leadId) => {
+    const selectedLeadScheduleActivity = leadId;
+    setCurrentLead(selectedLeadScheduleActivity);
     setActivitiesModal(true);
+  };
+
+  const onEscalateLead = (leadId) => {
+    const selectedLeadEscalateLead = leadId;
+    setCurrentLeadEscalate(selectedLeadEscalateLead);
+    setEscalateModal(true);
+  };
+
+  const updateLeadActivityTimeline = (currentLead, activityEntry) => {
+    const updatedLeads = rows.map((row) => {
+      // Match the lead by its ID
+      if (row.id === currentLead) {
+        return {
+          ...row,
+          leadTimeline: [...(row.leadTimeline || []), activityEntry], // Update leadTimeline
+        };
+      }
+      return row; // Keep other leads unchanged
+    });
+
+    setRows(updatedLeads); // Update state with new leads array
+    localStorage.setItem("leads", JSON.stringify(updatedLeads)); // Save updated leads to localStorage
+   // console.log("Updated Leads 143:", updatedLeads);
   };
 
   const theme = createTheme({
@@ -101,7 +138,59 @@ const Drawer = ({
   };
 
   const [value, setValue] = useState("1");
-  // const formattedDate = format(new Date(selectedLead.leadEntryTime), "MMMM do, yyyy 'at' h:mm a");
+
+  
+
+  const addFileToLeadTimeline = (currentLead, file) => {
+    const updatedLeads = rows.map((row) => {
+      // Match the lead by its ID
+      if (row.id === currentLead) {
+       // console.log('row.id:',row.id)
+       // console.log('currentLead:',currentLead)
+        return {
+          ...row,
+          leadTimeline: [
+            ...(row.leadTimeline || []),
+            {
+              type: "file", // Specify the type as 'file'
+              fileName: file.name,
+              fileSize: file.size,
+              fileType: file.type,
+              date: new Date().toISOString(), // Add a timestamp
+            },
+          ],
+        };
+      }
+      return row; // Keep other leads unchanged
+    });
+  
+   // console.log("Updated Leads with File:", updatedLeads);
+    setRows(updatedLeads); // Update state with new leads array
+    localStorage.setItem("leads", JSON.stringify(updatedLeads)); // Save updated leads to localStorage
+   // console.log("Updated Leads with File:", updatedLeads);
+  };
+  
+  const handleFileAttachment = (e, currentLead) => {
+    const file = e.target.files[0]; // Get the first file from the input
+    if (file) {
+      addFileToLeadTimeline(currentLead, file);
+    } else {
+     // console.log("No file selected");
+    }
+  };
+
+const [onProductTable,setOnProductTable] = useState(false)
+   const handleProductTable=()=>{
+    setOnProductTable(true)
+  }
+
+  const productEntryInAllEntries =(productEntryInAllEntries)=> {
+    // itemCode:selectedLead.itemCode
+    // itemCode:selectedLead.itemCode
+    // itemCode:selectedLead.itemCode
+    // itemCode:selectedLead.itemCode
+    console.log('productEntryInAllEntries:::',productEntryInAllEntries)
+  }
 
   return (
     <div
@@ -132,61 +221,77 @@ const Drawer = ({
               <h3 className="text-xl font-semibold">
                 {selectedLead.lead || "David Collins"}
               </h3>
-              <p className="text-gray-500">
-                {/* Lead Created on: {formattedDate = format(new Date(selectedLead.leadEntryTime), "MMMM do, yyyy 'at' h:mm a");} */}
+              {/* <p className="text-gray-500">
                 Lead Created on:{" "}
                 {format(
                   new Date(selectedLead.leadEntryTime),
                   "MMMM do, yyyy 'at' h:mm a"
                 )}
-              </p>
+              </p> */}
             </div>
 
             {/* Action Icons */}
             <div className="flex space-x-4">
-              {/* <button
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 text-blue-500"
-                aria-label="Call"
-              >
-                <CallIcon />
-              </button>
               <button
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 text-blue-500"
-                aria-label="Email"
-              >
-                <EmailIcon />
-              </button>
-              <button
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 text-blue-500"
-                aria-label="Address"
-              >
-                <LocationOnIcon />
-              </button> */}
-
-              <button
-                onClick={onActivities}
+                onClick={() => onActivities(selectedLead.id)}
                 className=" flex items-center justify-center rounded-lg bg-blue-100 p-2 hover:bg-blue-200 text-blue-500"
                 aria-label="Address"
               >
-                <span> Schedule Activity</span>
+                Schedule Activity
+                {/* <span> Schedule Activity</span> */}
               </button>
+
+              <button
+                onClick={() => onEscalateLead(selectedLead.id)}
+                className=" flex items-center justify-center rounded-lg bg-blue-100 p-2 hover:bg-blue-200 text-blue-500"
+                aria-label="Address"
+              >
+                Escalate Lead
+              </button>
+
+              {activitiesModal && selectedLead && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center ">
+                  <div className="relative z-100">
+                    <ScheduleActivityPopup
+                      lead={selectedLead}
+                      updateLeadActivityTimeline={updateLeadActivityTimeline}
+                      handleClose={handleClose}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {escalateModal && selectedLead && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center ">
+                  <div className="relative z-100">
+                    <EscalateLead
+                      lead={selectedLead}
+                      updateLeadActivityTimeline={updateLeadActivityTimeline}
+                      handleClose={handleCloseEscalate}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Contact Details */}
             <div className="text-center text-gray-500 space-y-1">
               {/* Lead Created on: {selectedLead.leadEntryTime } */}
 
-              <p className="text-gray-700 font-medium">
+              <p className="text-gray-500 font-normal">
                 Phone: {selectedLead.phone || "(973) 401 1282"}
               </p>
-              <p className="text-gray-700 font-medium">
+              <p className="text-gray-500 font-normal">
                 Email: {selectedLead.email || "d.collins@boyle.info"}
               </p>
-              <p className="text-gray-700 font-medium">
+              {/* <p className="text-gray-500 font-normal">
+                stage: {selectedLead.stage || "d.collins@boyle.info"}
+              </p> */}
+              {/* <p className="text-gray-500 font-normal">
                 Address:{" "}
                 {selectedLead.address ||
                   "46 Smith Street, Perth Amboy, NJ 0709"}
-              </p>
+              </p> */}
             </div>
           </div>
 
@@ -545,8 +650,8 @@ const Drawer = ({
                 </div>
 
                 {/* Priority Selection */}
-                <div className="mb-4 flex gap-4 items-center justify-between">
-                  <label className="block font-medium mb-2 text-black text-opacity-60">
+                <div className="mb-4  flex gap-3 items-center justify-center">
+                  <label className="block font-medium  text-black text-opacity-60">
                     Priority
                   </label>
                   <div className="flex space-x-2">
@@ -576,13 +681,14 @@ const Drawer = ({
                   <input
                     type="file"
                     name="file"
-                    onChange={(e) => handleInputChange(e, "file")}
+                    // onChange={(e) => handleInputChange(e, "file")}
+                    onChange={(e) => handleFileAttachment(e, selectedLead.id)}
                     className="rounded w-[90%] p-1"
                   />
                 </div>
 
                 {selectedLead.file ? (
-                  // console.log('selectedLead:',selectedLead)
+                  //// console.log('selectedLead:',selectedLead)
                   <div className="mb-4">
                     <p className="text-gray-600">Uploaded File:</p>
                     <p className="text-blue-500 underline">
@@ -607,6 +713,96 @@ const Drawer = ({
                   />
                 </div>
 
+                {selectedLead.leadIsItemAdded && (                
+<div className="  p-2 m-4 flex justify-center items-center " >
+{/* <button className="bg-yellow-400 px-2 py-2 rounded-lg" onClick={handleProductTable}>View Product Details</button> */}
+<button className="bg-yellow-400 px-2 py-2 rounded-lg"  onClick={() => setShowProducts(true)}>View Product Details</button>
+{showProducts &&
+  ReactDOM.createPortal(
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full mx-4">
+        <ProductsDetails
+          lead={selectedLead.name}
+          productDetails={productDetails}
+          productEntryInAllEntries={productEntryInAllEntries}
+          setShowProducts={setShowProducts}
+        />
+      </div>
+    </div>,
+    document.body // Render the overlay directly to the body
+  )
+}
+
+                {/* <div className="mb-4">
+                  <TextField
+                    label="Lead Item Code"
+                    fullWidth
+                    variant="standard"
+                    value={selectedLead.leadItemCode || ""}
+                    onChange={(e) => handleInputChange(e, "leadItemCode")}
+                  />
+                </div>
+                <div className="mb-4">
+                  <TextField
+                    label="Lead Item Description"
+                    fullWidth
+                    variant="standard"
+                    value={selectedLead.leadItemDescription || ""}
+                    onChange={(e) => handleInputChange(e, "leadItemDescription")}
+                  />
+                </div>
+                <div className="mb-4">
+                  <TextField
+                    label="Lead Item Unit"
+                    fullWidth
+                    variant="standard"
+                    value={selectedLead.leadItemUnit || ""}
+                    onChange={(e) => handleInputChange(e, "leadItemUnit")}
+                  />
+                </div>
+                <div className="mb-4"> 
+                   <TextField
+                    label="Lead Item Current Stock"
+                    fullWidth
+                    variant="standard"
+                    value={selectedLead.leadItemCurrentStock || ""}
+                    onChange={(e) => handleInputChange(e, "leadItemCurrentStock")}
+                  />
+                </div>
+                <div className="mb-4">
+                  <TextField
+                    label="Lead Item Quantity"
+                    fullWidth
+                    variant="standard"
+                    value={selectedLead.leadItemQuantity || ""}
+                    onChange={(e) => handleInputChange(e, "leadItemQuantity")}
+                  />
+                </div>
+                <div className="mb-4">
+                  <TextField
+                    label="Lead Item Price"
+                    fullWidth
+                    variant="standard"
+                    value={selectedLead.leadItemPrice || ""}
+                    onChange={(e) => handleInputChange(e, "leadItemPrice")}
+                  />
+                </div>
+                <div className="mb-4">
+                  <TextField
+                    label="Lead Item Amount"
+                    fullWidth
+                    variant="standard"
+                    value={selectedLead.leadItemAmount || ""}
+                    onChange={(e) => handleInputChange(e, "leadItemAmount")}
+                  />
+                </div> */}
+</div>
+                )}
+
+
+
+
+
                 <div className="flex justify-end space-x-4">
                   <Button
                     variant="outlined"
@@ -622,8 +818,6 @@ const Drawer = ({
               </form>
             </div>
 
-
-
             {/* Activity Timeline */}
             <div className="w-[60%] bg-white p-4 rounded-md shadow-md max-h-[80vh] overflow-y-scroll">
               <ThemeProvider theme={theme}>
@@ -635,10 +829,15 @@ const Drawer = ({
                     </TabList>
                   </Box>
                   <TabPanel sx={{ padding: 0 }} value="2">
-                  <ActivityLog leadsWithHistory={leadsWithHistory} />
+                    <ActivityLog leadsWithHistory={leadsWithHistory} />
                   </TabPanel>
-                  <TabPanel value="1" sx={{ padding: 0 }} >
-                  <HistoryDisplay leadsWithHistory={leadsWithHistory} />
+                  <TabPanel value="1" sx={{ padding: 0 }}>
+                    <HistoryDisplay
+
+                      rows2={rows}
+                      leadsWithHistory={leadsWithHistory}
+                      selectedLead={selectedLead}
+                    />
                   </TabPanel>
                 </TabContext>
               </ThemeProvider>
@@ -647,14 +846,6 @@ const Drawer = ({
         </>
       ) : (
         <p>No lead selected</p>
-      )}
-
-      {activitiesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center ">
-          <div className="relative z-100">
-            <ScheduleActivityPopup />
-          </div>
-        </div>
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
+import products from "../utils/products.png"
 
 import LeadStatusModal from "../modals/LeadStatusModal";
 import LeadDeleteModal from "../modals/LeadDeleteModal";
@@ -7,6 +8,7 @@ import LeadSelectModal from "../modals/LeadSelectModal";
 import filter from "../utils/filter.png";
 
 const TableComponent = ({ rows, setRows }) => {
+  console.log("rows in table", rows);
   const [filters, setFilters] = useState({
     leadCreateDate: "",
     lastActivityDate: "",
@@ -169,7 +171,7 @@ const TableComponent = ({ rows, setRows }) => {
   const handleEdit = (rows) => {
     // Implement your edit logic here
     // For example, you could redirect to an edit page or show an edit form
-    console.log("Editing:", rows);
+    // console.log("Editing:", rows);
     closeModal(); // Optionally close the modal
   };
 
@@ -177,7 +179,7 @@ const TableComponent = ({ rows, setRows }) => {
   const handleViewLead = (rows) => {
     // Implement your view lead logic here
     // For example, redirect to a detailed view or open a details modal
-    console.log("Viewing lead details:", rows);
+    // console.log("Viewing lead details:", rows);
     closeModal(); // Optionally close the modal
   };
 
@@ -185,24 +187,47 @@ const TableComponent = ({ rows, setRows }) => {
     // First, find the lead to update
     const leadToMove = rows.find((row) => row.id === leadId);
 
-    if (leadToMove) {
-      // Update the status of the lead to "Qualified" and add it to qualifiedLeads
-      const updatedLead = { ...leadToMove, status: "qualified" };
-      const updatedQualifiedLeads = [...qualifiedLeads, updatedLead];
-      setQualifiedLeads(updatedQualifiedLeads);
-
-      // Remove the lead from the current rows list
-      setRows((prevRows) => {
-        const updatedRows = prevRows.filter((row) => row.id !== leadId);
-        // Save the updated rows and qualified leads to localStorage
-        localStorage.setItem("rows", JSON.stringify(updatedRows));
-        localStorage.setItem(
-          "qualifiedLeads",
-          JSON.stringify(updatedQualifiedLeads)
-        );
-        return updatedRows;
-      });
+    if (!leadToMove) {
+      console.error("Lead not found");
+      return;
     }
+
+    // Ensure timeline is an array or initialize it if not present
+    const timeline = Array.isArray(leadToMove.timeline)
+      ? leadToMove.timeline
+      : [];
+
+    // Create a new timeline entry for the status change
+    const currentTimestamp = new Date().toISOString();
+    const statusChangeTimeline = {
+      date: currentTimestamp,
+      activity: "Status changed to Qualified",
+    };
+
+    // Add the status change activity to the lead's timeline
+    const updatedLead = {
+      ...leadToMove,
+      status: "qualified",
+      timeline: [...timeline, statusChangeTimeline], // Add the new timeline entry
+    };
+
+    // Update the list of qualified leads
+    const updatedQualifiedLeads = [...qualifiedLeads, updatedLead];
+    setQualifiedLeads(updatedQualifiedLeads);
+
+    // Remove the lead from the current rows list
+    setRows((prevRows) => {
+      const updatedRows = prevRows.filter((row) => row.id !== leadId);
+
+      // Save the updated rows and qualified leads to localStorage
+      localStorage.setItem("rows", JSON.stringify(updatedRows));
+      localStorage.setItem(
+        "qualifiedLeads",
+        JSON.stringify(updatedQualifiedLeads)
+      );
+
+      return updatedRows;
+    });
 
     // Close the modal after updating
     setShowStatusModal(false);
@@ -268,12 +293,8 @@ const TableComponent = ({ rows, setRows }) => {
           Add Lead
         </button>
 
-
-
         {/* Search Bar */}
         <div className="relative flex justify-end my-2 ">
-
-
           <input
             type="text"
             className=" py-2 pl-10 pr-4 rounded-lg  text-black placeholder-gray-400 border border-none shadow-sm bg-white w-full"
@@ -495,7 +516,17 @@ const TableComponent = ({ rows, setRows }) => {
                       // }}
                     />
                   </td>
-                  <td className="shadow-sm px-1 py-0.5">{row.lead}</td>
+                  <td className=" shadow-sm px-1 py-0.5   ">
+                  <div className="flex items-center justify-left gap-2 cursor-pointer">
+                    {row.lead}
+                    {row.leadIsItemAdded && (
+                      // <span className=" bg-green-500 text-white text-xs p-1  rounded-full">
+                      //    Products 
+                      // </span> 
+                      <img src={products} alt="products-icon" className="w-5 h-5 text-white bg-green-200 text-white text-xs p-1  rounded-lg" />
+                    )}
+                    </div>
+                  </td>
                   <td
                     className={`shadow-sm px-1 py-0.5 cursor-pointer `}
                     onClick={() => openStatusModal(row)}

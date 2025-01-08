@@ -36,7 +36,19 @@ const ActivityLog = ({ leadsWithHistory }) => {
                 {/* Content */}
                 <div className="flex-1">
                   <div className="flex gap-2">
-                    <p className="text-sm font-medium mb-1">{activity.activity} </p>
+
+
+
+                  <Tooltip title={activity.activity} arrow>
+                  <p
+                    className="text-sm font-medium mb-1 truncate max-w-[50%]"
+                  >
+                    {activity.activity}
+                  </p>
+                  </Tooltip>
+
+
+                    {/* <p className="text-sm font-medium mb-1">{activity.activity} </p> */}
                     <span
                       className="mb-1 px-1 py-0.5 rounded-full text-xs font-normal text-white flex items-center gap-1"
                       style={{
@@ -54,7 +66,6 @@ const ActivityLog = ({ leadsWithHistory }) => {
                   <Tooltip title={activity.note} arrow>
                   <p
                     className="text-xs text-gray-500 truncate max-w-[50%]"
-                    title={activity.note}
                   >
                     {activity.note}
                   </p>

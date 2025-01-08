@@ -25,7 +25,7 @@ import DiscoveryLeads from "./DiscoveryLeads";
 import WonLeads from "./WonLeads";
 import Drawer from "./Drawer";
 import HistoryDisplay from "./HistoryDisplay";
-
+import products from "../utils/products.png";
 const QualifiedLeads = () => {
   const [discoveryLeads, setDiscoveryLeads] = useState(
     JSON.parse(localStorage.getItem("discoveryLeads")) || [] // Initialize from localStorage if available
@@ -51,11 +51,11 @@ const QualifiedLeads = () => {
   const [selectedLeads, setSelectedLeads] = useState([]); // State to track selected leads
   const [showDeleteModal, setShowDeleteModal] = useState(false); // Modal state
   const [showDrawer, setShowDrawer] = useState(false); // Drawer visibility state
-  const [selectedLead, setSelectedLead] = useState(null); // Store selected lead for Drawer
+  const [selectedLead, setSelectedLead] = useState(null); // Store selected lead for
   const [viewMode, setViewMode] = useState("Tabular"); // View mode state
   const [history, setHistory] = useState([]); // State to track history of selected lead
   // const [timeline, setTimeline] = useState([]); // State to track history of selected lead
-  
+
   const [rows, setRows] = useState(() => {
     const savedData = localStorage.getItem("qualifiedLeads");
     return savedData ? JSON.parse(savedData) : [];
@@ -64,8 +64,9 @@ const QualifiedLeads = () => {
   useEffect(() => {
     localStorage.setItem("qualifiedLeads", JSON.stringify(qualifiedLeads)); // Save qualified leads to localStorage
   }, [qualifiedLeads]);
-  
-  // console.log('qualifiedLeads:',qualifiedLeads)
+
+  // // console.log('qualifiedLeads in qualified leads:',qualifiedLeads)
+  // // console.log('qualifiedLeads in qualified leads.leadTimeline:',qualifiedLeads.leadTimeline)
   // setTimeline(qualifiedLeads)
   const stageMapping = {
     new: "New",
@@ -114,37 +115,38 @@ const QualifiedLeads = () => {
   const handleSave = (e) => {
     e.preventDefault();
 
-      // Loop through the fields of selectedLead to detect changes
-  const updatedLead = { ...selectedLead };
-  // const leadTimeline = 
+    // Loop through the fields of selectedLead to detect changes
+    const updatedLead = { ...selectedLead };
+    // const leadTimeline =
 
+    let isChanged = false; // Flag to track if any field has changed
+    const updatedHistory = updatedLead.history || []; // Ensure history exists
 
-  let isChanged = false; // Flag to track if any field has changed
-  const updatedHistory = updatedLead.history || []; // Ensure history exists
+    // Compare fields and add changes to history
+    Object.keys(updatedLead).forEach((field) => {
+      const oldValue = qualifiedLeads.find(
+        (lead) => lead.id === selectedLead.id
+      )[field];
+      const newValue = updatedLead[field];
+      if (oldValue !== newValue) {
+        // If the field has changed, add an activity to the history
+        updatedHistory.push({
+          date: new Date().toISOString(),
+          activity: `Field "${field}" updated`,
+          note: `Changed from "${oldValue}" to "${newValue}"`,
+        });
 
-  // Compare fields and add changes to history
-  Object.keys(updatedLead).forEach((field) => {
-    const oldValue = qualifiedLeads.find((lead) => lead.id === selectedLead.id)[field];
-    const newValue = updatedLead[field];
-    if (oldValue !== newValue) {
-      // If the field has changed, add an activity to the history
-      updatedHistory.push({
-        date: new Date().toISOString(),
-        activity: `Field "${field}" updated`,
-        note: `Changed from "${oldValue}" to "${newValue}"`,
-      });
+        isChanged = true; // Set flag to true if any field has changed
+      }
+    });
 
-      isChanged = true; // Set flag to true if any field has changed
+    // Only update history and save if there are changes
+    if (isChanged) {
+      updatedLead.history = updatedHistory;
+      setHistory(updatedHistory); // Update history state
+      // console.log('updatedLead.leadHistory',updatedLead.leadHistory)
+      // console.log('updatedLead.history',updatedLead.history)
     }
-  });
-
-  // Only update history and save if there are changes
-  if (isChanged) {
-    updatedLead.history = updatedHistory;
-    setHistory(updatedHistory); // Update history state
-    console.log('updatedLead.history',updatedLead.history)
-  }
-
 
     const updatedLeads = qualifiedLeads.map((lead) =>
       lead.id === selectedLead.id ? selectedLead : lead
@@ -162,7 +164,6 @@ const QualifiedLeads = () => {
   const closeStatusModal = () => {
     setShowStageModal(false);
   };
-
 
   const handleEdit = (lead) => {
     setSelectedLead(lead);
@@ -207,7 +208,7 @@ const QualifiedLeads = () => {
     // Update the rows state and remove the updated lead
     setRows((prevRows) => {
       const updatedRows = prevRows.filter((row) => row.id !== leadId);
-      console.log("updatedRows", updatedRows);
+      // console.log("updatedRows", updatedRows);
 
       // Save updated rows to localStorage
       localStorage.setItem("qualifiedLeads", JSON.stringify(updatedRows));
@@ -218,7 +219,7 @@ const QualifiedLeads = () => {
     // Add the updated lead to the discoveryLeads list
     const updatedDiscoveryLeads = [...discoveryLeads, updatedQualifiedLead];
     setDiscoveryLeads(updatedDiscoveryLeads);
-    console.log("updatedDiscoveryLeads", updatedDiscoveryLeads);
+    // console.log("updatedDiscoveryLeads", updatedDiscoveryLeads);
 
     // Save updated discoveryLeads to localStorage
     localStorage.setItem(
@@ -235,13 +236,26 @@ const QualifiedLeads = () => {
     const leadToMoveWon = rows.find((row) => row.id === leadId);
     if (!leadToMoveWon) return; // Guard against invalid ID
 
-    // Update the lead's stage to "won"
-    const updatedQualifiedLeadWon = { ...leadToMoveWon, stage: "won" };
+    // Create a new timeline entry for the status change to "Won"
+    const currentTimestamp = new Date().toISOString(); // Get the current timestamp
+    const statusChangeTimeline = {
+      date: currentTimestamp,
+      activity: "Stage changed to Won",
+    };
 
-    // Update the rows state and remove the updated lead
+    // Ensure timeline exists and is an array, then add the new activity
+    const updatedQualifiedLeadWon = {
+      ...leadToMoveWon,
+      stage: "won", // Update stage to won
+      timeline: Array.isArray(leadToMoveWon.timeline)
+        ? [...leadToMoveWon.timeline, statusChangeTimeline] // Add the new timeline entry
+        : [statusChangeTimeline], // If no timeline, create a new array with the status change
+    };
+
+    // Update the rows state and remove the updated lead from rows
     setRows((prevRows) => {
       const updatedRows = prevRows.filter((row) => row.id !== leadId);
-      console.log("updatedRows", updatedRows);
+      // console.log("updatedRows", updatedRows);
 
       // Save updated rows to localStorage
       localStorage.setItem("qualifiedLeads", JSON.stringify(updatedRows));
@@ -252,13 +266,10 @@ const QualifiedLeads = () => {
     // Add the updated lead to the wonLeads list
     const updatedWonLeads = [...wonLeads, updatedQualifiedLeadWon];
     setWonLeads(updatedWonLeads);
-    console.log("updatedWonLeads", updatedWonLeads);
+    // console.log("updatedWonLeads", updatedWonLeads);
 
-    // Save updated discoveryLeads to localStorage
-    localStorage.setItem(
-      "wonLeads",
-      JSON.stringify(updatedWonLeads)
-    );
+    // Save updated wonLeads to localStorage
+    localStorage.setItem("wonLeads", JSON.stringify(updatedWonLeads));
 
     // Close the modal
     setShowStageModal(false);
@@ -275,7 +286,7 @@ const QualifiedLeads = () => {
     // Update the rows state and remove the updated lead
     setRows((prevRows) => {
       const updatedRows = prevRows.filter((row) => row.id !== leadId);
-      console.log("updatedRows", updatedRows);
+      // console.log("updatedRows", updatedRows);
 
       // Save updated rows to localStorage
       localStorage.setItem("qualifiedLeads", JSON.stringify(updatedRows));
@@ -287,72 +298,76 @@ const QualifiedLeads = () => {
     // Add the updated lead to the wonLeads list
     const updatedLostLeads = [...lostLeads, updatedQualifiedLeadLost];
     setLostLeads(updatedLostLeads);
-    console.log("updatedLostLeads", updatedLostLeads);
+    // console.log("updatedLostLeads", updatedLostLeads);
 
     // Save updated discoveryLeads to localStorage
-    localStorage.setItem(
-      "lostLeads",
-      JSON.stringify(updatedLostLeads)
-    );
+    localStorage.setItem("lostLeads", JSON.stringify(updatedLostLeads));
 
     // Close the modal
     setShowStageModal(false);
   };
-
+  // console.log('selectedLeadddd:',selectedLead)
+  // // console.log('selectedLead.leadTimeline:',selectedLead.leadTimeline)
   return (
-    <div className="p-6 relative">
+    <div className="p-6 relative text-sm font-thin">
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-xl font-normal mb-2">Qualified Leads</h2>
         <ButtonGroup
-      variant="outlined"
-      sx={{
-        backgroundColor: "white",
-        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)", // shadow-sm equivalent
-        "& .MuiButton-outlined": {
-          border: "none", // Removes the outline
-        },
-      }}
-    >
-      <Button
-        onClick={() => setViewMode("Kanban")}
-        sx={{
-          backgroundColor: viewMode === "transparent", // Light blue for selected
-          "& img": {
-            filter: viewMode === "Kanban" ? "invert(29%) sepia(98%) saturate(2942%) hue-rotate(202deg) brightness(95%) contrast(92%)" : "none", // Blue color for selected
-          },
-        }}
-      >
-        <img src={kanban} alt="kanban-icon" className="w-6 h-6" />
-      </Button>
-      <Button
-        onClick={() => setViewMode("Tabular")}
-        sx={{
-          backgroundColor: viewMode ===  "transparent", // Light blue for selected
-          "& img": {
-            filter: viewMode === "Tabular" ? "invert(29%) sepia(98%) saturate(2942%) hue-rotate(202deg) brightness(95%) contrast(92%)" : "none", // Blue color for selected
-          },
-        }}
-      >
-        <img src={table} alt="table-icon" className="w-6 h-6" />
-      </Button>
-    </ButtonGroup>
+          variant="outlined"
+          sx={{
+            backgroundColor: "white",
+            boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)", // shadow-sm equivalent
+            "& .MuiButton-outlined": {
+              border: "none", // Removes the outline
+            },
+          }}
+        >
+          <Button
+            onClick={() => setViewMode("Kanban")}
+            sx={{
+              backgroundColor: viewMode === "transparent", // Light blue for selected
+              "& img": {
+                filter:
+                  viewMode === "Kanban"
+                    ? "invert(29%) sepia(98%) saturate(2942%) hue-rotate(202deg) brightness(95%) contrast(92%)"
+                    : "none", // Blue color for selected
+              },
+            }}
+          >
+            <img src={kanban} alt="kanban-icon" className="w-6 h-6" />
+          </Button>
+          <Button
+            onClick={() => setViewMode("Tabular")}
+            sx={{
+              backgroundColor: viewMode === "transparent", // Light blue for selected
+              "& img": {
+                filter:
+                  viewMode === "Tabular"
+                    ? "invert(29%) sepia(98%) saturate(2942%) hue-rotate(202deg) brightness(95%) contrast(92%)"
+                    : "none", // Blue color for selected
+              },
+            }}
+          >
+            <img src={table} alt="table-icon" className="w-6 h-6" />
+          </Button>
+        </ButtonGroup>
       </div>
 
       {viewMode === "Kanban" ? (
         <KanbanViewQualified rows={rows} setRows={setRows} />
       ) : (
         <div>
-            {selectedLeads.length>0 &&
-          <div className="mb-2">
-            <button
-            onClick={() => setShowDeleteModal(true)}
-            className="bg-red-500 text-white px-4 py-2 rounded mr-2"
-            disabled={selectedLeads.length === 0}
-            >
-              Delete Selected
-            </button>
-          </div>
-            }
+          {selectedLeads.length > 0 && (
+            <div className="mb-2">
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                disabled={selectedLeads.length === 0}
+              >
+                Delete Selected
+              </button>
+            </div>
+          )}
           <table className="table-auto w-[100%] border-collapse border border-gray-200">
             <thead className="bg-gray-100">
               <tr>
@@ -398,21 +413,40 @@ const QualifiedLeads = () => {
             </thead>
             <tbody className="bg-white">
               {qualifiedLeads.map((row) => (
-                 <tr key={`${row.id}-${row.stage}`}>
-                  <td className="shadow-sm px-1 py-0">
+                <tr key={`${row.id}-${row.stage}`}>
+                  <td className="shadow-sm px-1 py-0 w-10">
+                    <div className=" flex justify-right items-center gap-1.5">
+
                     <input
                       type="checkbox"
                       className="rounded border border-sm shadow"
                       checked={selectedLeads.includes(row.id)}
                       onChange={() => handleCheckboxChange(row.id)}
-                    />
+                      />
+
+                    {row.leadIsItemAdded && (
+                      <img
+                      src={products}
+                      alt="products-icon"
+                      className="w-1 h-1 bg-green-500 text-xs p-1 rounded-lg"
+                      />
+                    )}
+                    </div>
                   </td>
+
                   <td
-                    className="shadow-sm px-1 py-0 cursor-pointer "
                     onClick={() => viewLead(row.id)}
+                    className=" shadow-sm px-1 py-0.5"
                   >
+                    {/* <div className="flex items-center justify-left gap-2 cursor-pointer">
+                    {row.leadIsItemAdded && (
+                      <img src={products} alt="products-icon" className="w-5 h-5  bg-green-200  text-xs p-0.5  rounded-lg" />
+                    )}
+                    {row.lead}
+                    </div> */}
                     {row.lead}
                   </td>
+
                   <td
                     className="shadow-sm px-1 py-0"
                     onClick={() => openStatusModal(row)}
@@ -420,7 +454,7 @@ const QualifiedLeads = () => {
                     {/* {row.status && ( */}
                     {row.stage && (
                       <button
-                        className={`w-full text-white text-center p-1 my-0.5 rounded ${
+                        className={`w-full text-white text-center rounded p-1 mb-0.5  ${
                           row.stage === "new"
                             ? "bg-purple-500"
                             : row.stage === "discovery"
@@ -456,8 +490,11 @@ const QualifiedLeads = () => {
             selectedLead={selectedLead}
             handleInputChange={handleInputChange}
             handleSave={handleSave}
+            rows={rows}
+            setRows={setRows} // Passing state and updater function
             leadsWithHistory={history}
             stageMapping={stageMapping}
+            // updatedLead.leadHistory
             // leadTimeline={selectedLead.leadTimeline}
           />
 
@@ -530,7 +567,9 @@ const QualifiedLeads = () => {
             <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50 ">
               <div className="bg-white p-6 rounded-lg shadow-lg w-80 ">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-xl   mb-4 text-center">Update Lead Stage</h3>
+                  <h3 className="text-xl   mb-4 text-center">
+                    Update Lead Stage
+                  </h3>
                   <div
                     onClick={closeStatusModal}
                     className="cursor-pointer text-gray-600 hover:text-gray-900"
@@ -561,13 +600,15 @@ const QualifiedLeads = () => {
                     Negotiation
                   </button>
                   <button
-                  onClick={() => updateStageToWon(selectedLead.id)}
-                  className="bg-green-400 text-white px-1 py-2 rounded">
+                    onClick={() => updateStageToWon(selectedLead.id)}
+                    className="bg-green-400 text-white px-1 py-2 rounded"
+                  >
                     Won
                   </button>
-                  <button 
-                   onClick={() => updateStageToLost(selectedLead.id)}
-                  className="bg-red-500 text-white px-1 py-2 rounded">
+                  <button
+                    onClick={() => updateStageToLost(selectedLead.id)}
+                    className="bg-red-500 text-white px-1 py-2 rounded"
+                  >
                     Lost
                   </button>
                   <hr className="mt-4 border-gray-400" />

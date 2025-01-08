@@ -29,7 +29,7 @@ const Leads = () => {
   useEffect(() => {
     localStorage.setItem("leadTableData", JSON.stringify(rows));
   }, [rows]);
-
+// console.log('rows:',rows)
   const handleFormSubmit = (formData) => {
   const existingLead = rows.find((row) => row.id === formData.id); // Find the existing lead by ID
 
@@ -85,12 +85,22 @@ const Leads = () => {
       area: formData.area,
       leadEntryTime: formData.leadEntryTime,
       leadTimeline: formData.timeline,
+      leadItemCode:formData.itemCode,
+      leadIsItemAdded:formData.isItemAdded,
+      leadItemDescription:formData.itemDescription,
+      leadItemUnit:formData.itemUnit,
+      leadItemCurrentStock:formData.itemCurrentStock,
+      leadItemQuantity:formData.itemQuantity,
+      leadItemPrice:formData.itemPrice,
+      leadItemAmount:formData.itemAmount,
 
 
 
     };
     setRows([...rows, newRow]); // Add the new row to the table
   };
+  // console.log('leadIsItemAdded from leads',leadIsItemAdded)
+
   };
 
   const [viewMode, setViewMode] = useState("Tabular"); // View mode state

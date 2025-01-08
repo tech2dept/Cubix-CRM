@@ -27,10 +27,10 @@ const Header = ({ toggleSidebar }) => {
     <header style={{ backgroundColor: '#f8f8f8' }} className="text-black p-4 flex items-center justify-between fixed w-full top-0 left-0 z-20 text-black">
       
       {/* Menu Button (Sidebar Toggle) */}
- <div className="flex gap-16 justify-between items-center">     
-      <button className=" text-2xl" onClick={toggleSidebar}>
+ <div className="flex gap-6 justify-between items-center">     
+      {/* <button className=" text-2xl" onClick={toggleSidebar}>
+      </button> */}
         {/* <AiOutlineMenu /> */}
-      </button>
 
       {/* Title */}
       {/* <div className="text-xl text-black font-semibold">CUBIX CRM</div> */}

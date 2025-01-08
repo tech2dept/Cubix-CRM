@@ -3,22 +3,27 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 // import TableComponent from "./Table";
 import { Checkbox, FormControlLabel } from "@mui/material";
+import ProductsInfo from "./ProductsInfo";
+import attachfile from '../utils/attachfile.png'
+import whatsapp from '../utils/whatsapp.png'
 
 const AllEntriesForm = ({ onFormSubmit }) => {
   const initialFormData = {
-    id: Date.now(),
-    name: "",
+    id: Date.now(),//
+    name: "",//
     phone: "",//
     alternatePhone: "",//
     isPhoneWhatsApp: false,//
     isAlternatePhoneWhatsApp: false,//
-    status: "",
+    status: "",//
     organization: "",//
     title: "",//
     email: "",//
     notes: "",//
     leadSource: "",//
-    leadDateAndTimeEntry: "",
+    campaignId: "",//
+    departmentNo: "",//
+    leadDateAndTimeEntry: "",//
     probability: "",//
     bookedAmount: "",//
     territory: "",//
@@ -28,8 +33,37 @@ const AllEntriesForm = ({ onFormSubmit }) => {
     apartment: "",//
     location: "",//
     area: "",//
+    // priority: "",//
     leadEntryTime: "",
     timeline: "",
+    isItemAdded:'',
+    itemCode:'',
+    itemDescription:'',
+    itemUnit:'',
+    itemCurrentStock:'',
+    itemQuantity:'',
+    itemPrice:'',
+    itemAmount:'',
+
+
+
+    // "CmpCode": null,
+    // "mode": null,
+    // "alternateEmail": null,
+  //   "SalesPerson": null,
+  //   "TeamID": null,
+  //   "Coordinator": null,
+  //   "Comments": null,
+  //   "CampaignId": null,
+  //   "CreatedBy": null,
+  //   "deptno": null,
+  //   "Prod_code": null,
+  //   "Prod_Description": null,
+  //   "Prod_Unit": null,
+  //   "Prod_Qty": null,
+  //   "Prod_Price": null,
+  //   "Prod_Amount": null,
+  //   "Prod_Comments": null
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -43,23 +77,31 @@ const AllEntriesForm = ({ onFormSubmit }) => {
   //       setFormData(savedData);
   //     }
   //   }, []);
+  const [fileName , setFileName] = useState('No file chosen')
 
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
+const handleChange = (e) => {
+  const { name, value, type, files } = e.target;
+
+  if (type === "file") {
+    const file = files?.[0]; // Safely access the first file
+    if (file) {
+      setFileName(file.name); // Update the state with the file name
+    } else {
+      setFileName("No file chosen"); // Reset if no file is selected
+    }
+  } else {
     setFormData({
       ...formData,
-      [name]: type === "file" ? files[0] : name === "territory" ? value.toLowerCase() : value,
+      [name]: name === "territory" ? value.toLowerCase() : value,
     });
-  };
+  }
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const allowedTerritories = ["dubai", "abudhabi", "sharjah", "ajman", "othersTerritory"];
-    
-    if (!allowedTerritories.includes(formData.territory)) {
-      alert("Please select a valid territory.");
-      return;
-    }
+
+
+
     
     const currentTimestamp = new Date().toISOString(); // Get the current timestamp
     // const formDataWithTimestamp = { ...formData, leadEntryTime: currentTimestamp };
@@ -71,13 +113,61 @@ const AllEntriesForm = ({ onFormSubmit }) => {
       },
     ], };
 
-    console.log("Form Data with Lead Entry Time and timeline: ", formDataWithTimestamp);
+    console.log("Form Data with Lead Entry Time and timeline formDataWithTimestamp: ", formDataWithTimestamp);
     
+    // productEntryInAllEntries()
+    console.log('formDataWithTimestamp::::',formDataWithTimestamp)
     onFormSubmit(formDataWithTimestamp);
     alert("Form Data Submitted Succesfully!");
-
     setFormData(initialFormData);
   };
+
+
+
+
+
+
+  const productEntryInAllEntries = (productEntryTimeline) => {
+    // console.log("productEntryTimeline from all entries:", productEntryTimeline);
+    // console.log(
+    //   "productFormData:",
+    //   productEntryTimeline.productDetails.productFormData
+    // );
+  const productFormData = productEntryTimeline.productDetails.productFormData
+    // const productFormData = productEntryTimeline.productDetails.productFormData;
+    console.log('productFormData:',productFormData)
+    // // Update the formData with productFormData
+
+
+
+    const isProductAdded = !!(
+      productFormData.itemCode ||
+      productFormData.itemDescription ||
+      productFormData.itemUnit ||
+      productFormData.itemCurrentStock ||
+      productFormData.itemQuantity ||
+      productFormData.itemPrice ||
+      productFormData.itemAmount
+    );
+  
+    console.log('isProductAdded ::  :',isProductAdded)
+
+
+
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      isItemAdded:isProductAdded,
+      itemCode: productFormData.itemCode || "",
+      itemDescription: productFormData.itemDescription || "",
+      itemUnit: productFormData.itemUnit || "",
+      itemCurrentStock: productFormData.itemCurrentStock || "",
+      itemQuantity: productFormData.itemQuantity || "",
+      itemPrice: productFormData.itemPrice || "",
+      itemAmount: productFormData.itemAmount || "",
+    }));
+  };
+
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -91,11 +181,13 @@ const AllEntriesForm = ({ onFormSubmit }) => {
     setFormData({ ...formData, priority: level });
   };
 
+
+
   return (
     <div className=" min-h-screen flex  justify-center items-center">
       <form
         className="bg-white rounded-lg px-4 py-2 w-full  shadow-lg"
-        onSubmit={handleSubmit}
+        // onSubmit={handleSubmit}
       >
         {/* <div className="m-auto flex justify-between "> */}
         <h2 className="text-2xl font-semibold text-center my-3">
@@ -148,7 +240,7 @@ const AllEntriesForm = ({ onFormSubmit }) => {
           </div>
 
           <div className="flex justify-between items-center">
-            <div className="mb-0">
+            <div className="mb-0 w-[70%]">
               <TextField
                 label="Phone"
                 name="phone"
@@ -177,17 +269,19 @@ const AllEntriesForm = ({ onFormSubmit }) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label="WhatsApp"
+                label={<img src={whatsapp} alt="whatsapp-icon" className="w-5 h-5" />}
                 sx={{
                   marginLeft: 2,
                   color: "rgba(0, 0, 0, 0.6)",
+                  borderRadius: "16px",
+                  
                 }}
               />
             </div>
           </div>
 
           <div className="flex justify-between items-center">
-            <div className="mb-0">
+            <div className="mb-0 w-[70%]">
               <TextField
                 label="Alternate Phone"
                 name="alternatePhone"
@@ -214,7 +308,7 @@ const AllEntriesForm = ({ onFormSubmit }) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label="WhatsApp"
+                label={<img src={whatsapp} alt="whatsapp-icon" className="w-5 h-5" />}
                 sx={{
                   marginLeft: 2,
                   color: "rgba(0, 0, 0, 0.6)",
@@ -356,6 +450,72 @@ const AllEntriesForm = ({ onFormSubmit }) => {
               <MenuItem value="otherSource">Others</MenuItem>
             </TextField>
           </div>
+
+          <div className="mb-0">
+            <TextField
+            key={formData.campaignId}
+              select
+              label="Campaign ID"
+              name="campaignId"
+              value={formData.campaignId}
+              onChange={handleChange}
+              fullWidth
+              variant="standard"
+              id="standard"
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Figtree, sans-serif", // Force Figtree font for label
+                },
+              }}
+            >
+    <MenuItem value="" disabled>
+      Select Campaign
+    </MenuItem>
+    <MenuItem value="cmp001">Social Media Campaign</MenuItem>
+    <MenuItem value="cmp002">Google Ads Campaign</MenuItem>
+    <MenuItem value="cmp003">Email Marketing Campaign</MenuItem>
+    <MenuItem value="cmp004">Referral Campaign</MenuItem>
+    <MenuItem value="cmp005">Event Promotion Campaign</MenuItem>
+    <MenuItem value="cmp006">Content Marketing Campaign</MenuItem>
+    <MenuItem value="cmp007">SEO Campaign</MenuItem>
+    <MenuItem value="cmp008">Direct Mail Campaign</MenuItem>
+  </TextField>
+</div>
+
+
+
+
+
+<div className="mb-0">
+  <TextField
+    select
+    key={formData.departmentNo}
+    label="Department No"
+    name="departmentNo"
+    value={formData.departmentNo}
+    onChange={handleChange}
+    fullWidth
+    variant="standard"
+    id="standard"
+    sx={{
+      "& .MuiInputLabel-root": {
+        fontFamily: "Figtree, sans-serif", // Force Figtree font for label
+      },
+    }}
+  >
+    <MenuItem value="" disabled>
+      Select Department
+    </MenuItem>
+    <MenuItem value="dept101">Sales</MenuItem>
+    <MenuItem value="dept102">Marketing</MenuItem>
+    <MenuItem value="dept103">Customer Support</MenuItem>
+    <MenuItem value="dept104">IT</MenuItem>
+    <MenuItem value="dept105">Finance</MenuItem>
+    <MenuItem value="dept106">HR</MenuItem>
+    <MenuItem value="dept107">Logistics</MenuItem>
+    <MenuItem value="dept108">R&D</MenuItem>
+  </TextField>
+</div>
 
 
           <div className="mb-0">
@@ -584,7 +744,37 @@ const AllEntriesForm = ({ onFormSubmit }) => {
             />
           </div>
 
-          <div className="my-4  flex items-center justify-between">
+
+
+{/* <div className="my-4 flex items-center justify-center gap-4 ">
+ 
+  <label className="block font-medium text-black text-opacity-60">
+    Attach File
+  </label>
+
+    <label
+      htmlFor="file-upload"
+      className="flex items-center gap-2 justify-center px-4 py-2 bg-gray-300 text-white rounded-lg cursor-pointer hover:bg-gray-400 transition-colors duration-200"
+    >
+
+      <img src={attachfile} alt="attachfile-icon" className="w-5 h-5" />
+    </label>
+   
+    <input
+      id="file-upload"
+      type="file"
+      name="file"
+      onChange={handleChange}
+      className="hidden"
+    />
+
+    <p className=" text-sm text-gray-500 truncate">
+      {fileName}
+    </p>
+</div>  */}
+
+{/* 
+<div className="my-4  flex items-center justify-between">
             <label className="block font-medium mb-2 text-black text-opacity-60">
               Attach File
             </label>
@@ -594,11 +784,13 @@ const AllEntriesForm = ({ onFormSubmit }) => {
               onChange={handleChange}
               className=" rounded w-[70%] p-1  "
             />
-          </div>
+          </div> */}
+
+
 
           {/* Priority Selection */}
-          <div className="my-4 flex gap-4 items-center justify-between">
-            <label className="block font-medium mb-2 text-black text-opacity-60">
+          <div className=" flex gap-4 items-center justify-left mt-4" >
+            <label className="block font-medium  text-black text-opacity-90">
               Priority
             </label>
             <div className="flex space-x-2">
@@ -621,34 +813,14 @@ const AllEntriesForm = ({ onFormSubmit }) => {
           <br></br>
         </div>
 
-        <div className="productsContainer bg-blue-300 rounded px-4 py-2">
-          <h2 className="text-2xl font-semibold text-center my-3">
-            Products Information
-          </h2>
 
+<ProductsInfo lead={formData.name}  productEntryInAllEntries={productEntryInAllEntries} />
+
+        <div className="flex justify-center pt-6 pb-4 mt-8">
           <button
             type="submit"
-            className="bg-green-500 text-white px-4 py-2 rounded "
-          >
-            Add Product
-          </button>
-          {/* click this button to add producucts , show this below message when items are empty  */}
-          <div className="my-4 bg-white text-center p-6 rounded-sm">
-            {/* <TableComponent
-              title="Products"
-              rows={rows}
-              headCells={headCells}
-              onDelete={handleDelete}
-              onFilter={handleFilter}
-            /> */}
-            You haven't added any products yet. Click 'Add Product' to start!
-          </div>
-        </div>
-
-        <div className="flex justify-center pt-6 pb-4">
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded w-1/2"
+            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded w-1/2"
+            onClick={handleSubmit}
           >
             Submit
           </button>

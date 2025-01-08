@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
+import Drawer from "./Drawer";
 
 const WonLeads = ({ rows, setRows }) => {
+
+
   useEffect(() => {
     localStorage.setItem("rows", JSON.stringify(rows)); // Save rows to localStorage
   }, [rows]);
@@ -14,6 +17,72 @@ const WonLeads = ({ rows, setRows }) => {
   useEffect(() => {
     localStorage.setItem("wonLeads", JSON.stringify(wonLeads)); // Save contacted leads to localStorage
   }, [wonLeads]);
+
+    const [showDrawer, setShowDrawer] = useState(false); // Drawer visibility state
+
+
+    const viewLead = (id) => {
+      // const lead = qualifiedLeads.find((lead) => lead.id === id);
+      // setSelectedLead(lead);
+      setShowDrawer(true); // Show Drawer
+    };
+
+
+
+
+    const handleInputChange = (e, field) => {
+      // setSelectedLead((prevLead) => ({
+        // ...prevLead,
+        // [field]: e.target.value,
+      // }));
+    };
+  
+    const handleSave = (e) => {
+    //   e.preventDefault();
+  
+    //     // Loop through the fields of selectedLead to detect changes
+    // const updatedLead = { ...selectedLead };
+    // // const leadTimeline = 
+  
+  
+    // let isChanged = false; // Flag to track if any field has changed
+    // const updatedHistory = updatedLead.history || []; // Ensure history exists
+  
+    // // Compare fields and add changes to history
+    // Object.keys(updatedLead).forEach((field) => {
+    //   const oldValue = qualifiedLeads.find((lead) => lead.id === selectedLead.id)[field];
+    //   const newValue = updatedLead[field];
+    //   if (oldValue !== newValue) {
+    //     // If the field has changed, add an activity to the history
+    //     updatedHistory.push({
+    //       date: new Date().toISOString(),
+    //       activity: `Field "${field}" updated`,
+    //       note: `Changed from "${oldValue}" to "${newValue}"`,
+    //     });
+  
+    //     isChanged = true; // Set flag to true if any field has changed
+    //   }
+    // });
+  
+    // // Only update history and save if there are changes
+    // if (isChanged) {
+    //   updatedLead.history = updatedHistory;
+    //   setHistory(updatedHistory); // Update history state
+    //   console.log('updatedLead.leadHistory',updatedLead.leadHistory)
+    //   console.log('updatedLead.history',updatedLead.history)
+    // }
+  
+  
+    //   const updatedLeads = qualifiedLeads.map((lead) =>
+    //     lead.id === selectedLead.id ? selectedLead : lead
+    //   );
+    //   setQualifiedLeads(updatedLeads);
+    //   localStorage.setItem("qualifiedLeads", JSON.stringify(updatedLeads));
+    //   setShowDrawer(false); // Close Drawer after saving
+    };
+
+
+
 
 //   const stageMapping = {
 //     new: "New",
@@ -95,7 +164,12 @@ const WonLeads = ({ rows, setRows }) => {
                   onChange={() => handleRowSelect(row.id)}
                 />
               </td>
-              <td className="shadow-sm px-1 py-0.5">{row.lead}</td>
+              <td
+                    className="shadow-sm px-1 py-0 cursor-pointer "
+                    onClick={() => viewLead(row.id)}
+                  >
+                    {row.lead}
+                  </td>
               <td className="shadow-sm px-1 py-0.5">
                 {/* {row.stage && (
                   <button
@@ -134,6 +208,19 @@ const WonLeads = ({ rows, setRows }) => {
           ))}
         </tbody>
       </table>
+
+
+      <Drawer
+            showDrawer={showDrawer}
+            setShowDrawer={setShowDrawer}
+            // selectedLead={selectedLead}
+            handleInputChange={handleInputChange}
+            handleSave={handleSave}
+            // leadsWithHistory={history}
+            // stageMapping={stageMapping}
+            // updatedLead.leadHistory
+            // leadTimeline={selectedLead.leadTimeline}
+          />
     </div>
   ) : (
     <p className="text-center text-gray-500">No Won leads available.</p> // Fallback message

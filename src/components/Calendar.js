@@ -1,25 +1,46 @@
 import React, { useState } from "react";
 
-export default function CalendarPicker() {
+export default function CalendarPicker({ onSelectDateTime }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
   const handleDateClick = (date) => {
     setSelectedDate(date);
+    if (onSelectDateTime) {
+      onSelectDateTime({ date, startTime, endTime });
+    }
   };
 
-  const handleSave = () => {
-    console.log("Selected Date:", selectedDate);
-    console.log("Time:", startTime, "to", endTime);
+  const handleTimeChange = (type, value) => {
+    if (type === "start") setStartTime(value);
+    if (type === "end") setEndTime(value);
+    if (onSelectDateTime) {
+      onSelectDateTime({
+        date: selectedDate,
+        startTime: type === "start" ? value : startTime,
+        endTime: type === "end" ? value : endTime,
+      });
+    }
+  };
+
+  const handleYearChange = (event) => {
+    setSelectedYear(parseInt(event.target.value, 10));
+  };
+
+  const handleMonthChange = (event) => {
+    setSelectedMonth(parseInt(event.target.value, 10));
   };
 
   const generateTimeSlots = () => {
     const slots = [];
     for (let hour = 0; hour < 24; hour++) {
-      const formattedHour = hour.toString().padStart(2, "0");
-      slots.push(`${formattedHour}:00`);
-      slots.push(`${formattedHour}:30`);
+      const period = hour < 12 ? "AM" : "PM";
+      const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+      slots.push(`${formattedHour}:00 ${period}`);
+      slots.push(`${formattedHour}:30 ${period}`);
     }
     return slots;
   };
@@ -27,15 +48,11 @@ export default function CalendarPicker() {
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
 
   const renderCalendar = () => {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
+    const totalDays = daysInMonth(selectedMonth, selectedYear);
 
     const days = [];
-    const totalDays = daysInMonth(currentMonth, currentYear);
-
     for (let day = 1; day <= totalDays; day++) {
-      const date = new Date(currentYear, currentMonth, day);
+      const date = new Date(selectedYear, selectedMonth, day);
       days.push(date);
     }
 
@@ -53,88 +70,106 @@ export default function CalendarPicker() {
       </button>
     ));
   };
+
   return (
-    <div className="flex flex-col py-0 px-1 rounded-lg  border border-gray-300 w-full bg-blue-200">
-      {/* Calendar */}
-      <div className="flex justify-between w-full   gap-10">
-        <div className="w-full">
-          <div className="text-lg font-normal">April 2024</div>
-          <div className="grid grid-cols-7 gap-5 ">
-            <div className="text-gray-500">Su</div>
-            <div className="text-gray-500">Mo</div>
-            <div className="text-gray-500">Tu</div>
-            <div className="text-gray-500">We</div>
-            <div className="text-gray-500">Th</div>
-            <div className="text-gray-500">Fr</div>
-            <div className="text-gray-500">Sa</div>
-            {renderCalendar()}
-          </div>
+    <div className="flex flex-col py-0 px-1 rounded-lg border border-gray-300 w-full">
+      <div className="flex justify-right   items-center mb-4 space-x-4">
+        <div>
+          <label className="block text-sm font-medium">Select Year:</label>
+          <select
+            value={selectedYear}
+            onChange={handleYearChange}
+            className="border border-gray-300 rounded-lg p-2 w-20"
+          >
+            {Array.from({ length: 21 }, (_, i) => 2025 + i).map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* Time Slots */}
-        <div className="w-full">
-          <div className="mb-2 text-lg font-normal ">
-            {selectedDate
-              ? selectedDate.toDateString()
-              : "Select a date from the calendar"}
-          </div>
-
-
-
-          <div className="flex flex-col  space-y-2 w-auto">
-            <div>
-              <label className="block text-sm font-medium">Start Time</label>
-              <select
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-2"
-              >
-                <option value="">Select Start Time</option>
-                {generateTimeSlots().map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium">End Time</label>
-              <select
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-2"
-              >
-                <option value="">Select End Time</option>
-                {generateTimeSlots().map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+        <div>
+          <label className="block text-sm font-medium">Select Month:</label>
+          <select
+            value={selectedMonth}
+            onChange={handleMonthChange}
+            className="border border-gray-300 rounded-lg p-2 w-32"
+          >
+            {[
+              "January",
+              "February",
+              "March",
+              "April",
+              "May",
+              "June",
+              "July",
+              "August",
+              "September",
+              "October",
+              "November",
+              "December",
+            ].map((month, index) => (
+              <option key={index} value={index}>
+                {month}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex justify-end space-x-2">
-        <button
-          onClick={() => {
-            setSelectedDate(null);
-            setStartTime("");
-            setEndTime("");
-          }}
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSave}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          Save date and time
-        </button>
+      <div className="grid grid-cols-7 gap-2 mb-4">
+        <div>Su</div>
+        <div>Mo</div>
+        <div>Tu</div>
+        <div>We</div>
+        <div>Th</div>
+        <div>Fr</div>
+        <div>Sa</div>
+        {renderCalendar()}
       </div>
+
+      <div className="flex flex-col space-y-2 mb-4">
+        <div>
+          <label className="block text-sm font-medium">Start Time</label>
+          <select
+            value={startTime}
+            onChange={(e) => handleTimeChange("start", e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2"
+          >
+            <option value="">Select Start Time</option>
+            {generateTimeSlots().map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium">End Time</label>
+          <select
+            value={endTime}
+            onChange={(e) => handleTimeChange("end", e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2"
+          >
+            <option value="">Select End Time</option>
+            {generateTimeSlots().map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {selectedDate && (
+        <div className="p-4 border-t border-gray-300">
+          <h3 className="text-lg font-medium">Selected Details:</h3>
+          <p>Date: {selectedDate.toDateString()}</p>
+          <p>Start Time: {startTime || "Not selected"}</p>
+          <p>End Time: {endTime || "Not selected"}</p>
+        </div>
+      )}
     </div>
   );
 }

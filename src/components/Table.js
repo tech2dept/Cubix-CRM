@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
-import products from "../utils/products.png"
+import products from "../utils/products.png";
 
 import LeadStatusModal from "../modals/LeadStatusModal";
 import LeadDeleteModal from "../modals/LeadDeleteModal";
@@ -445,7 +445,7 @@ const TableComponent = ({ rows, setRows }) => {
           <table className="table-auto w-[100%] border-collapse border border-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="shadow-sm px-1 py-0.5 text-center">
+                <th className="shadow-sm px-1 py-0.5 text-left">
                   <input
                     type="checkbox"
                     className="rounded border border-sm shadow"
@@ -494,6 +494,8 @@ const TableComponent = ({ rows, setRows }) => {
                   }`} // Highlight row when selected
                 >
                   <td className="shadow-sm px-1 py-0.5 text-center">
+                  
+                  <div className=" flex justify-right items-center gap-1.5">
                     <input
                       type="checkbox"
                       className="rounded border border-sm"
@@ -507,24 +509,21 @@ const TableComponent = ({ rows, setRows }) => {
                         }
                       }}
 
-                      // onChange={() => {
-                      //   setSelectedRows((prev) =>
-                      //     prev.includes(row.id)
-                      //       ? prev.filter((id) => id !== row.id)
-                      //       : [...prev, row.id]
-                      //   );
-                      // }}
                     />
-                  </td>
-                  <td className=" shadow-sm px-1 py-0.5   ">
-                  <div className="flex items-center justify-left gap-2 cursor-pointer">
-                    {row.lead}
+
                     {row.leadIsItemAdded && (
-                      // <span className=" bg-green-500 text-white text-xs p-1  rounded-full">
-                      //    Products 
-                      // </span> 
-                      <img src={products} alt="products-icon" className="w-5 h-5 text-white bg-green-200 text-white text-xs p-1  rounded-lg" />
+                      <img
+                        src={products}
+                        alt="products-icon"
+                        className="w-1 h-1 bg-green-500 text-xs p-1 rounded-lg"
+                      />
                     )}
+                    </div>
+                  </td>
+
+                  <td className=" shadow-sm px-1 py-0.5   ">
+                    <div className="flex items-center justify-left gap-2 cursor-pointer">
+                      {row.lead}
                     </div>
                   </td>
                   <td

@@ -369,8 +369,8 @@ const QualifiedLeads = () => {
             </div>
           )}
           <table className="table-auto w-[100%] border-collapse border border-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
+            <thead className=" bg-gray-100">
+              <tr className="">
                 <th className="shadow-sm px-1 py-0 text-left font-normal">
                   <input
                     type="checkbox"
@@ -388,7 +388,7 @@ const QualifiedLeads = () => {
                     }
                   />
                 </th>
-                <th className="shadow-sm px-1 py-0 text-left font-normal">
+                <th className="shadow-sm px-1 py-0.5 text-left font-normal">
                   Lead
                 </th>
                 <th className="shadow-sm px-1 py-0 text-left font-normal">
@@ -436,7 +436,7 @@ const QualifiedLeads = () => {
 
                   <td
                     onClick={() => viewLead(row.id)}
-                    className=" shadow-sm px-1 py-0.5"
+                    className=" shadow-sm px-1 py-0.5 cursor-pointer"
                   >
                     {/* <div className="flex items-center justify-left gap-2 cursor-pointer">
                     {row.leadIsItemAdded && (

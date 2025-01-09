@@ -9,6 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import ReactDOM from "react-dom";
+import attachfile from '../utils/attachfile.png'
 
 import CallIcon from "@mui/icons-material/Call";
 import { AiOutlinePhone } from "react-icons/ai";
@@ -139,7 +140,7 @@ console.log('currentLead::',currentLead)
 
   const [value, setValue] = useState("1");
 
-  
+  const [fileName , setFileName] = useState('No file chosen')
 
   const addFileToLeadTimeline = (currentLead, file) => {
     const updatedLeads = rows.map((row) => {
@@ -173,8 +174,10 @@ console.log('currentLead::',currentLead)
   const handleFileAttachment = (e, currentLead) => {
     const file = e.target.files[0]; // Get the first file from the input
     if (file) {
+      setFileName(file.name);
       addFileToLeadTimeline(currentLead, file);
     } else {
+      setFileName("No file chosen"); 
      // console.log("No file selected");
     }
   };
@@ -678,35 +681,79 @@ const [onProductTable,setOnProductTable] = useState(false)
                   <label className="block font-medium mb-2 text-black text-opacity-60">
                     Attach File
                   </label>
+                  <label
+                    htmlFor="file-upload"
+                    className="flex items-center gap-2 justify-center px-4 py-2 bg-gray-300 text-white rounded-lg cursor-pointer hover:bg-gray-400 transition-colors duration-200"
+                  >
+                    <img src={attachfile} alt="attachfile-icon" className="w-5 h-5" />
+                  </label>
                   <input
+                    id="file-upload"
                     type="file"
                     name="file"
                     // onChange={(e) => handleInputChange(e, "file")}
                     onChange={(e) => handleFileAttachment(e, selectedLead.id)}
-                    className="rounded w-[90%] p-1"
+                    // className="rounded w-[90%] p-1"
+                    className="hidden"
                   />
+                      <p className=" text-sm text-gray-500 truncate">
+                        {fileName}
+                      </p>
                 </div>
 
-                {selectedLead.file ? (
-                  //// console.log('selectedLead:',selectedLead)
+
+
+
+{/* <div className="my-4 flex items-center justify-center gap-4 ">
+ 
+  <label className="block font-medium text-black text-opacity-60">
+    Attach File
+  </label>
+
+    <label
+      htmlFor="file-upload"
+      className="flex items-center gap-2 justify-center px-4 py-2 bg-gray-300 text-white rounded-lg cursor-pointer hover:bg-gray-400 transition-colors duration-200"
+    >
+
+      <img src={attachfile} alt="attachfile-icon" className="w-5 h-5" />
+    </label>
+   
+    <input
+      id="file-upload"
+      type="file"
+      name="file"
+      onChange={handleChange}
+      className="hidden"
+    />
+
+    <p className=" text-sm text-gray-500 truncate">
+      {fileName}
+    </p>
+</div>  */}
+
+
+
+
+
+
+                {/* {selectedLead.file ? (
                   <div className="mb-4">
                     <p className="text-gray-600">Uploaded File:</p>
                     <p className="text-blue-500 underline">
-                      {/* {selectedLead.file.name || "No name available"} */}
                       {selectedLead.file.split("\\").pop() ||
                         "No name available"}
                     </p>
                   </div>
                 ) : (
                   <p>No file uploaded</p>
-                )}
+                )} */}
 
                 <div className="mb-4">
                   <TextField
                     label="Notes"
                     fullWidth
                     multiline
-                    rows={3}
+                    rows={1}
                     variant="standard"
                     value={selectedLead.notes || ""}
                     onChange={(e) => handleInputChange(e, "notes")}
@@ -715,14 +762,14 @@ const [onProductTable,setOnProductTable] = useState(false)
 
                 {selectedLead.leadIsItemAdded && (                
 <div className="  p-2 m-4 flex justify-center items-center " >
-{/* <button className="bg-yellow-400 px-2 py-2 rounded-lg" onClick={handleProductTable}>View Product Details</button> */}
-<button className="bg-yellow-400 px-2 py-2 rounded-lg"  onClick={() => setShowProducts(true)}>View Product Details</button>
+<button type="button" className="bg-yellow-400 px-2 py-2 rounded-lg"  onClick={() => setShowProducts(true)}>View Product Details</button>
 {showProducts &&
   ReactDOM.createPortal(
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full mx-4">
         <ProductsDetails
-          lead={selectedLead.name}
+          // lead={selectedLead.name}
+          lead={selectedLead}
           productDetails={productDetails}
           productEntryInAllEntries={productEntryInAllEntries}
           setShowProducts={setShowProducts}
@@ -804,15 +851,15 @@ const [onProductTable,setOnProductTable] = useState(false)
 
 
                 <div className="flex justify-end space-x-4">
+                  <Button variant="contained" color="primary" type="submit">
+                    Save
+                  </Button>
                   <Button
                     variant="outlined"
                     color="secondary"
                     onClick={() => setShowDrawer(false)}
                   >
                     Cancel
-                  </Button>
-                  <Button variant="contained" color="primary" type="submit">
-                    Save
                   </Button>
                 </div>
               </form>

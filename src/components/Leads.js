@@ -117,7 +117,7 @@ const Leads = () => {
   });
 
   return (
-    <div>
+    <div className="text-sm font-thin">
       <ThemeProvider theme={theme}>
         <TabContext value={value}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -192,7 +192,7 @@ const Leads = () => {
               </div>
             </div>
           </TabPanel>
-          <TabPanel value="2">
+          <TabPanel sx={{ marginTop: 0 }} value="2">
             <AllEntriesForm onFormSubmit={handleFormSubmit} />
           </TabPanel>
         </TabContext>

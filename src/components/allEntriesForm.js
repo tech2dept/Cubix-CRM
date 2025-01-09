@@ -67,6 +67,7 @@ const AllEntriesForm = ({ onFormSubmit }) => {
   };
 
   const [formData, setFormData] = useState(initialFormData);
+  const [addProduct, setAddProduct] = useState(false);
 
   // setting stored data from localStorage
   // Load data from localStorage when the component mounts
@@ -128,15 +129,14 @@ const handleChange = (e) => {
 
 
   const productEntryInAllEntries = (productEntryTimeline) => {
-    // console.log("productEntryTimeline from all entries:", productEntryTimeline);
-    // console.log(
-    //   "productFormData:",
-    //   productEntryTimeline.productDetails.productFormData
-    // );
-  const productFormData = productEntryTimeline.productDetails.productFormData
-    // const productFormData = productEntryTimeline.productDetails.productFormData;
-    console.log('productFormData:',productFormData)
-    // // Update the formData with productFormData
+    console.log("productEntryTimeline from all entries:", productEntryTimeline);
+  
+    // Ensure productEntryTimeline has data and extract the first entry
+    const productFormData = productEntryTimeline && productEntryTimeline[0] 
+      ? productEntryTimeline[0] 
+      : {};
+  
+    console.log("productFormData:", productFormData);
 
 
 
@@ -182,9 +182,12 @@ const handleChange = (e) => {
   };
 
 
+  const onAddProduct =()=>{
+    setAddProduct(true)
+  }
 
   return (
-    <div className=" min-h-screen flex  justify-center items-center">
+    <div className="flex  justify-center items-center ">
       <form
         className="bg-white rounded-lg px-4 py-2 w-full  shadow-lg"
         // onSubmit={handleSubmit}
@@ -787,9 +790,9 @@ const handleChange = (e) => {
           </div> */}
 
 
-
+{/* <div className="bg-green-200 flex "> */}
           {/* Priority Selection */}
-          <div className=" flex gap-4 items-center justify-left mt-4" >
+          <div className=" flex gap-4 items-center justify-left mt-4 " >
             <label className="block font-medium  text-black text-opacity-90">
               Priority
             </label>
@@ -810,16 +813,35 @@ const handleChange = (e) => {
               ))}
             </div>
           </div>
-          <br></br>
+
+<div></div>
+<div></div>
+<div className=" flex gap-4 items-center justify-end mt-4 " >
+<div></div>
+<div>
+
+          <button
+          type="button"
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+          onClick={onAddProduct}
+          >
+          Add Product
+        </button>
+</div>
+</div>
+{/* </div> */}
+          {/* <br></br> */}
+
         </div>
+{ addProduct &&
+<ProductsInfo lead={formData.name}  productEntryInAllEntries={productEntryInAllEntries} onAddProducts={addProduct} />
+}
 
 
-<ProductsInfo lead={formData.name}  productEntryInAllEntries={productEntryInAllEntries} />
-
-        <div className="flex justify-center pt-6 pb-4 mt-8">
+        <div className="flex justify-center pt-2 pb-0  " >
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded w-1/2"
+            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 my-2 rounded w-40"
             onClick={handleSubmit}
           >
             Submit

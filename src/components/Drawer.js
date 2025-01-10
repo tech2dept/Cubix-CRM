@@ -195,6 +195,13 @@ const [onProductTable,setOnProductTable] = useState(false)
     console.log('productEntryInAllEntries:::',productEntryInAllEntries)
   }
 
+
+  const saveProductDetails = (updatedProducts) => {
+    console.log("Updated Products:", updatedProducts);
+    // Perform API call or update state in parent
+  };
+
+
   return (
     <div
       style={{ backgroundColor: "#f8f8f8 " }}
@@ -773,6 +780,8 @@ const [onProductTable,setOnProductTable] = useState(false)
           productDetails={productDetails}
           productEntryInAllEntries={productEntryInAllEntries}
           setShowProducts={setShowProducts}
+          onSaveProducts={saveProductDetails} // Pass save handler
+
         />
       </div>
     </div>,

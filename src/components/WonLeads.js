@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Drawer from "./Drawer";
-
+import Pagination from "@mui/material/Pagination";
+import PaginationItem from '@mui/material/PaginationItem';
+import Stack from '@mui/material/Stack';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 const WonLeads = ({ rows, setRows }) => {
 
 
@@ -113,6 +117,21 @@ const WonLeads = ({ rows, setRows }) => {
     }
   };
 
+
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const rowsPerPage = 5; // Number of rows per page
+  
+    // Calculate the rows to display on the current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const currentRows = wonLeads.slice(startIndex, startIndex + rowsPerPage);
+  
+    // Handle page change
+    const handleChangePage = (event, newPage) => {
+      setCurrentPage(newPage);
+    };
+
+
   return wonLeads.length> 0? ( 
     
     <div className="py-6">
@@ -149,7 +168,7 @@ const WonLeads = ({ rows, setRows }) => {
           </tr>
         </thead>
         <tbody className="bg-white">
-          {wonLeads.map((row) => (
+          {currentRows.map((row) => (
             <tr
               key={`${row.id}-${row.lead}`}
               className={`${
@@ -208,6 +227,27 @@ const WonLeads = ({ rows, setRows }) => {
           ))}
         </tbody>
       </table>
+
+                  {/* Pagination Component */}
+                  <div className="flex justify-end mt-4">
+                  <Stack spacing={2}>
+              <Pagination
+                count={Math.ceil(wonLeads.length / rowsPerPage)} // Total number of pages
+                page={currentPage}
+                onChange={handleChangePage}
+                // color="primary"
+                // variant="outlined"
+                // shape="rounded" 
+                size="small"
+                renderItem={(item) => (
+                  <PaginationItem
+                    slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }}
+                    {...item}
+                  />
+                )}
+              />
+              </Stack>
+            </div>
 
 
       <Drawer

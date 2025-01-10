@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import emptyList from '../utils/emptyList.png';
 import expand from '../utils/expand.png';
+import products from "../utils/products.png";
+
 
 import {
     TextField,
@@ -152,13 +154,20 @@ const KanbanViewQualified = ({ setRows }) => {
                 >
                   <div className="flex justify-between items-center">
                   <h3 className="font-normal">{lead.lead}</h3>
+                  {lead.leadIsItemAdded && (
+                  <img
+                  src={products}
+                  alt="products-icon"
+                  className="w-1 h-1 bg-green-500 text-xs p-1 rounded-lg m-1"
+                  />
+                  )}
                   <img src={expand} alt='expand-icon' className="w-4 h-4" />
                   </div>
                   <p className="text-sm text-gray-600">
                   {lead.organization || "No organization"}
                   </p>
                   
-                  <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600">
                   {lead.title || "No title"}
                 </p>
                 <p className="text-sm text-gray-600">

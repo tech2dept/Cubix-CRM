@@ -1,281 +1,157 @@
 import React, { useState, useEffect } from "react";
-import AddProductsModal from "../modals/AddProductsModal";
+import Box from "@mui/material/Box";
+import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
+import addProduct from "../utils/addProducts.png";
+import deleteIcon from "../utils/delete.png";
 
 const ProductsDetails = ({
   lead,
   productDetails,
   setShowProducts,
   productEntryInAllEntries,
+  onSaveProducts,
 }) => {
-  const [addProductModal, setAddProductModal] = useState(false);
+  console.log('productDetails:',productDetails)
+  const [products, setProducts] = useState(productDetails);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [editRowData, setEditRowData] = useState({});
-  const [products, setProducts] = useState(productDetails); // Use state to manage the product list
+  const apiRef = useGridApiRef();
 
-  // Sync productEntries with the parent component
   useEffect(() => {
-    productEntryInAllEntries(products); // Notify parent component of product changes
-  }, [products, productEntryInAllEntries]);
+    productEntryInAllEntries(products);
+  }, [products]);
 
-  const onAddProduct = () => {
-    setAddProductModal(true); // Open modal for adding products
+  useEffect(() => {
+    // Transform productDetails to match column keys
+    const transformedProducts = productDetails.map((detail, index) => ({
+      id: index, // Add a unique id if not present
+      itemCode: detail.leadItemCode,
+      itemDescription: detail.leadItemDescription,
+      itemUnit: detail.leadItemUnit,
+      itemCurrentStock: detail.leadItemCurrentStock,
+      itemQuantity: detail.leadItemQuantity,
+      itemPrice: detail.leadItemPrice,
+      itemAmount: detail.leadItemAmount,
+    }));
+    setProducts(transformedProducts);
+  }, [productDetails]);
+
+  const columns = [
+    { field: "itemCode", headerName: "Item Code", width:250, editable: true, flex: 1 },
+    { field: "itemDescription", headerName: "Description", width:250, editable: true, flex: 1 },
+    { field: "itemUnit", headerName: "Unit", width: 250, editable: true, flex: 1 },
+    { field: "itemCurrentStock", headerName: "Current Stock", width: 250, editable: true, flex: 1 },
+    { field: "itemQuantity", headerName: "Quantity", width:250, editable: true, flex: 1 },
+    { field: "itemPrice", headerName: "Price", width:250, editable: true, flex: 1 },
+    { field: "itemAmount", headerName: "Amount", width:250, editable: true, flex: 1 },
+  ];
+
+  const handleAddRow = () => {
+    const newRow = {
+      id: Date.now(),
+      itemCode: "",
+      itemDescription: "",
+      itemUnit: "",
+      itemCurrentStock: "",
+      itemQuantity: "",
+      itemPrice: "",
+      itemAmount: "",
+    };
+    setProducts((prev) => [...prev, newRow]);
+
+    setTimeout(() => {
+      apiRef.current.setCellFocus(newRow.id, columns[0].field,);
+      apiRef.current.startCellEditMode({ id: newRow.id, field: columns[0].field, });
+    }, 0);
   };
 
-  const handleClose = () => {
-    setShowProducts(false); // Close the modal
-  };
-
-  // Handle changes when editing a product
-  const handleEdit = (index) => {
-    setEditingIndex(index);
-    setEditRowData({ ...products[index] });
-  };
-
-  // Handle changes in the input fields
-  const handleChange = (e, field) => {
-    const value = e.target.type === "number" ? parseFloat(e.target.value) || "" : e.target.value;
-    setEditRowData({ ...editRowData, [field]: value });
-  };
-
-  // Save the edited row
-  const handleSave = () => {
-    const updatedProducts = [...products];
-    updatedProducts[editingIndex] = editRowData;
-    setProducts(updatedProducts);
-    setEditingIndex(null);
-    setEditRowData({});
-  };
-
-  // Cancel the editing
-  const handleCancel = () => {
-    setEditingIndex(null);
-    setEditRowData({});
-  };
-
-  // Delete selected products
   const handleDeleteSelected = () => {
-    setProducts((prevProducts) => 
-      prevProducts.filter((_, index) => !selectedRows.includes(index))
-    );
+    setProducts((prev) => prev.filter((row) => !selectedRows.includes(row.id)));
     setSelectedRows([]);
   };
 
-  // Select or deselect all rows
-  const handleSelectAll = () => {
-    setSelectedRows(
-      selectedRows.length === products.length ? [] : products.map((_, index) => index)
-    );
+  const handleRowSelection = (ids) => {
+    setSelectedRows(ids);
   };
 
-  // Select or deselect a single row
-  const handleSelectRow = (index) => {
-    setSelectedRows((prevSelected) =>
-      prevSelected.includes(index)
-        ? prevSelected.filter((i) => i !== index)
-        : [...prevSelected, index]
-    );
+  const handleSave = () => {
+    // Propagate updated products back to the parent or save via API
+    const updatedProducts = products.map((product) => ({
+      leadItemCode: product.itemCode,
+      leadItemDescription: product.itemDescription,
+      leadItemUnit: product.itemUnit,
+      leadItemCurrentStock: product.itemCurrentStock,
+      leadItemQuantity: product.itemQuantity,
+      leadItemPrice: product.itemPrice,
+      leadItemAmount: product.itemAmount,
+    }));
+    onSaveProducts(updatedProducts); // Call the save function
+    alert("Product details saved successfully!");
   };
-  
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 font-thin text-sm">
-      {/* Modal Container */}
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full relative">
-        {/* Close Button */}
         <button
-          onClick={handleClose}
+          onClick={() => setShowProducts(false)}
           className="absolute top-4 right-4 text-gray-500 hover:text-black focus:outline-none"
-          aria-label="Close"
         >
           ✖
         </button>
 
-<div className="flex  items-centet justify-around">
-
-        {/* Header */}
-        <div className="flex justify-between items-center mb-4 gap-12">
+        <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-thin">Products Information</h2>
-          <button
-            type="button"
-            className="bg-green-500 text-white px-4 py-2 mr-8 rounded hover:bg-green-700"
-            onClick={onAddProduct}
-          >
-            Add Product
-          </button>
-        </div>
-
-
-        {selectedRows.length > 0 && (
-          <div className="flex justify-end mb-4">
+          <div className="flex gap-2">
             <button
               type="button"
-              className="bg-red-500 text-white px-4 py-2 rounded"
-              onClick={handleDeleteSelected}
+              onClick={handleAddRow}
+              className="text-white px-4 py-2 rounded"
             >
-              Delete Selected
+              <img src={addProduct} alt="Add Product" className="w-4 h-4" />
             </button>
+            {selectedRows.length > 0 && (
+              <button
+                type="button"
+                onClick={handleDeleteSelected}
+                className="  text-white px-4 py-2 rounded "
+              >
+                <img src={deleteIcon} alt="Delete" className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        )}
-</div>
-
-        {/* Product Table */}
-        <div className=" bg-white text-center rounded-sm">
-          {products.length === 0 ? (
-            <p>You haven't added any products yet. Click 'Add Product' to start!</p>
-          ) : (
-            <table className="  w-full bg-white rounded-lg shadow-md">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="py-3 px-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedRows.length === products.length}
-                      onChange={handleSelectAll}
-                    />
-                  </th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">Item Code</th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">Description</th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">Unit</th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">
-                    Current Stock
-                  </th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">Quantity</th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">Price</th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">Amount</th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((entry, index) => (
-                  <tr
-                    key={index}
-                    className={`hover:bg-gray-50 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
-                  >
-                    <td className="py-4 px-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedRows.includes(index)}
-                        onChange={() => handleSelectRow(index)}
-                      />
-                    </td>
-                    <td className="py-4 px-4 text-gray-700">
-                      {editingIndex === index ? (
-                        <input
-                          type="text"
-                          value={editRowData.leadItemCode}
-                          onChange={(e) => handleChange(e, "leadItemCode")}
-                          className="w-full px-2 py-1 rounded"
-                        />
-                      ) : (
-                        entry.leadItemCode
-                      )}
-                    </td>
-                    <td className="py-4 px-4 text-gray-700">
-                      {editingIndex === index ? (
-                        <input
-                          type="text"
-                          value={editRowData.leadItemDescription}
-                          onChange={(e) => handleChange(e, "leadItemDescription")}
-                          className="w-full px-2 py-1 rounded"
-                        />
-                      ) : (
-                        entry.leadItemDescription
-                      )}
-                    </td>
-                    <td className="py-4 px-4 text-gray-700">
-        {editingIndex === index ? (
-          <input
-            type="text"
-            value={editRowData.leadItemUnit}
-            onChange={(e) => handleChange(e, "leadItemUnit")}
-            className="w-full px-2 py-1 rounded"
-          />
-        ) : (
-          entry.leadItemUnit
-        )}
-      </td>
-      <td className="py-4 px-4 text-gray-700">
-        {editingIndex === index ? (
-          <input
-            type="number"
-            value={editRowData.leadItemCurrentStock}
-            onChange={(e) => handleChange(e, "leadItemCurrentStock")}
-            className="w-full px-2 py-1 rounded"
-          />
-        ) : (
-          entry.leadItemCurrentStock
-        )}
-      </td>
-      <td className="py-4 px-4 text-gray-700">
-        {editingIndex === index ? (
-          <input
-            type="number"
-            value={editRowData.leadItemQuantity}
-            onChange={(e) => handleChange(e, "leadItemQuantity")}
-            className="w-full px-2 py-1 rounded"
-          />
-        ) : (
-          entry.leadItemQuantity
-        )}
-      </td>
-      <td className="py-4 px-4 text-gray-700">
-        {editingIndex === index ? (
-          <input
-            type="number"
-            value={editRowData.leadItemPrice}
-            onChange={(e) => handleChange(e, "leadItemPrice")}
-            className="w-full px-2 py-1 rounded"
-          />
-        ) : (
-          entry.leadItemPrice
-        )}
-      </td>
-      <td className="py-4 px-4 text-gray-700">
-        {editingIndex === index ? (
-          <input
-            type="number"
-            value={editRowData.leadItemAmount}
-            onChange={(e) => handleChange(e, "leadItemAmount")}
-            className="w-full px-2 py-1 rounded"
-          />
-        ) : (
-          entry.leadItemAmount
-        )}
-      </td>
-                    <td className="py-4 px-4">
-                      {editingIndex === index ? (
-                        <div className="flex gap-2">
-                          <button
-                            className="bg-blue-500 text-white px-3 py-1 rounded"
-                            onClick={handleSave}
-                          >
-                            Save
-                          </button>
-                          <button
-                            className="bg-gray-400 text-white px-3 py-1 rounded"
-                            onClick={handleCancel}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          className="bg-yellow-500 text-white px-3 py-1 rounded"
-                          onClick={() => handleEdit(index)}
-                        >
-                          Edit
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
         </div>
 
-
+        <Box sx={{ height: 400, width: "100%" }}>
+          <DataGrid
+            rows={products}
+            columns={columns}
+            getRowId={(row) => row.leadItemCode || row.id} 
+            apiRef={apiRef}
+            checkboxSelection
+            disableSelectionOnClick
+            disableColumnResize
+            processRowUpdate={(newRow) => {
+              setProducts((prev) =>
+                prev.map((row) => (row.id === newRow.id ? newRow : row))
+              );
+              return newRow;
+            }}
+            onRowSelectionModelChange={handleRowSelection}
+            density="compact"
+            experimentalFeatures={{ newEditingApi: true }}
+            hideFooterPagination
+            hideFooter
+          />
+        </Box>
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Save Changes
+          </button>
+        </div>
       </div>
     </div>
   );

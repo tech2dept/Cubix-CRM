@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-
+import Pagination from "@mui/material/Pagination";
+import PaginationItem from '@mui/material/PaginationItem';
+import Stack from '@mui/material/Stack';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 const LostLeads = ({ rows, setRows }) => {
   useEffect(() => {
     localStorage.setItem("rows", JSON.stringify(rows)); // Save rows to localStorage
@@ -44,6 +48,19 @@ const LostLeads = ({ rows, setRows }) => {
     }
   };
 
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5; // Number of rows per page
+
+  // Calculate the rows to display on the current page
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const currentRows = lostLeads.slice(startIndex, startIndex + rowsPerPage);
+
+  // Handle page change
+  const handleChangePage = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
+
   return lostLeads.length > 0 ? (
     <div className="py-6">
       <h2 className="text-xl mb-2">Lost Leads</h2>
@@ -82,59 +99,60 @@ const LostLeads = ({ rows, setRows }) => {
           </tr>
         </thead>
         <tbody className="bg-white">
-          {lostLeads.map((row) => (
-            <tr
-              key={`${row.id}-${row.lead}`}
-              className={`${
-                selectedRows.includes(row.id) ? "bg-blue-200" : ""
-              }`} // Highlight row when selected
-            >
-              <td className="shadow-sm px-1 py-0.5 text-center">
-                <input
-                  type="checkbox"
-                  className="rounded border border-sm"
-                  checked={selectedRows.includes(row.id)}
-                  onChange={() => handleRowSelect(row.id)}
-                />
-              </td>
-              <td className="shadow-sm px-1 py-0.5">{row.lead}</td>
-              <td className="shadow-sm px-1 py-0.5">
-                {/* {row.stage && (
-                  <button
-                    className={`w-full text-white text-center p-1 my-0.5 rounded
-                         ${
-                      row.stage === "new"
-                        ? "bg-purple-500"
-                        : row.stage === "discovery"
-                        ? "bg-violet-600"
-                        : row.stage === "proposal"
-                        ? "bg-blue-400"
-                        : row.stage === "negotiation"
-                        ? "bg-blue-800"
-                        : row.stage === "won"
-                        ? "bg-green-400"
-                        : row.stage === "lost"
-                        ? "bg-red-400"
-                        : "bg-gray-300" // default case if no match
-                    }
-                    `}
-                  >
-                    {stageMapping[row.stage] || row.stage}
-                  </button>
-                )} */}
-                <button className="w-full text-white text-center p-1 my-0.5 rounded bg-red-600">
-                  Lost
-                </button>
-              </td>
-              <td className="shadow-sm px-1 py-0.5">{row.organization}</td>
-              <td className="shadow-sm px-1 py-0.5">{row.title}</td>
-              <td className="shadow-sm px-1 py-0.5">{row.email}</td>
-              <td className="shadow-sm px-1 py-0.5">{row.phone}</td>
-              <td className="shadow-sm px-1 py-0.5">{row.notes}</td>
-            </tr>
-          ))}
-        </tbody>
+  {currentRows.map((row) => (
+    <tr
+      key={`${row.id}-${row.lead}`}
+      className={`${
+        selectedRows.includes(row.id) ? "bg-blue-200" : ""
+      }`} // Highlight row when selected
+    >
+      <td className="shadow-sm px-1 py-0.5 text-center">
+        <input
+          type="checkbox"
+          className="rounded border border-sm"
+          checked={selectedRows.includes(row.id)}
+          onChange={() => handleRowSelect(row.id)}
+        />
+      </td>
+      <td className="shadow-sm px-1 py-0.5">{row.lead}</td>
+      <td className="shadow-sm px-1 py-0.5">
+        <button className="w-full text-white text-center p-1 my-0.5 rounded bg-red-600">
+          Lost
+        </button>
+      </td>
+      <td className="shadow-sm px-1 py-0.5">{row.organization}</td>
+      <td className="shadow-sm px-1 py-0.5">{row.title}</td>
+      <td className="shadow-sm px-1 py-0.5">{row.email}</td>
+      <td className="shadow-sm px-1 py-0.5">{row.phone}</td>
+      <td className="shadow-sm px-1 py-0.5">{row.notes}</td>
+    </tr>
+  ))}
+</tbody>
+
       </table>
+
+
+            {/* Pagination Component */}
+            <div className="flex justify-end mt-4">
+            <Stack spacing={2}>
+        <Pagination
+          count={Math.ceil(lostLeads.length / rowsPerPage)} // Total number of pages
+          page={currentPage}
+          onChange={handleChangePage}
+          // color="primary"
+          // variant="outlined"
+          // shape="rounded" 
+          size="small"
+          renderItem={(item) => (
+            <PaginationItem
+              slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }}
+              {...item}
+            />
+          )}
+        />
+        </Stack>
+        
+      </div>
     </div>
   ) : (
     <p className="text-center text-gray-500">No Lost leads available.</p> // Fallback message

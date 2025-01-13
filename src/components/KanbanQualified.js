@@ -115,6 +115,17 @@ const KanbanViewQualified = ({ setRows }) => {
     lost: "Lost",
   };
 
+  const calculateAgedDays = (leadEntryTime) => {
+    const entryTime = new Date(leadEntryTime);
+    const currentTime = new Date();
+    const diffInMilliseconds = currentTime - entryTime;
+  
+    const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+    const diffInHours = Math.floor((diffInMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  
+    return `Aged Days: ${diffInDays} days, ${diffInHours} hrs`;
+  };
+
   return (
     <div className="flex gap-4 p-4">
       {Object.keys(stageMapping).map((stage,index) => (
@@ -173,6 +184,16 @@ const KanbanViewQualified = ({ setRows }) => {
                 <p className="text-sm text-gray-600">
                   {lead.email || "No email"}
                 </p>
+                <p className="text-xs font-thin bg-gray-400 px-0.5 mt-2 rounded-lg text-white">
+                  {/* {lead.email || "No email"} */}
+                    {calculateAgedDays(lead.leadEntryTime)}
+                </p>
+
+
+
+
+
+
                 </div>
               ))}
 

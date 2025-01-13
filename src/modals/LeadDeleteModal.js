@@ -60,6 +60,7 @@ import {
           <button
             className="px-4 py-2 bg-gray-100 text-black rounded hover:bg-gray-300"
             onClick={() => {
+              console.log('selectedRows in delete modal:',selectedRows)
               handleDelete(selectedRows); // Call delete function
               // openDeletePopup(selectedRows);  // Call delete popup
             }}

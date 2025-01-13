@@ -284,24 +284,30 @@ const handleChange = (e) => {
           </div>
 
           <div className="flex justify-between items-center">
-            <div className="mb-0 w-[70%]">
-              <TextField
-                label="Alternate Phone"
-                name="alternatePhone"
-                type="number"
-                value={formData.alternatePhone}
-                onChange={handleChange}
-                placeholder="Enter Alternate Phone Number"
-                fullWidth
-                variant="standard"
-                id="standard"
-                sx={{
-                  "& .MuiInputLabel-root": {
-                    fontFamily: "Figtree, sans-serif", // Force Figtree font for label
-                  },
-                }}
-              />
-            </div>
+          <div className="mb-0 w-[70%]">
+  <TextField
+    label="Alternate Phone"
+    name="alternatePhone"
+    type="number"
+    value={formData.alternatePhone}
+    onChange={handleChange}
+    placeholder="Enter Alternate Phone Number"
+    fullWidth
+    variant="standard"
+    id="standard"
+    sx={{
+      "& .MuiInputLabel-root": {
+        fontFamily: "Figtree, sans-serif", // Apply Figtree font
+      },
+      "& .MuiInputLabel-root.Mui-focused": {
+        color: "inherit", // Prevent the label from turning blue
+      },
+      "& .MuiInput-root::after": {
+        borderBottomColor: "transparent", // Remove blue underline
+      },
+    }}
+  />
+</div>
             <div>
               <FormControlLabel
                 control={

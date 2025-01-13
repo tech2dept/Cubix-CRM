@@ -4,7 +4,7 @@ import PaginationItem from '@mui/material/PaginationItem';
 import Stack from '@mui/material/Stack';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-const LostLeads = ({ rows, setRows }) => {
+const LostLeads = ({ rows, setRows,rowsPerPage }) => {
   useEffect(() => {
     localStorage.setItem("rows", JSON.stringify(rows)); // Save rows to localStorage
   }, [rows]);
@@ -50,7 +50,7 @@ const LostLeads = ({ rows, setRows }) => {
 
 
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5; // Number of rows per page
+  // const rowsPerPage = rowsPerPage; // Number of rows per page
 
   // Calculate the rows to display on the current page
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -128,7 +128,6 @@ const LostLeads = ({ rows, setRows }) => {
     </tr>
   ))}
 </tbody>
-
       </table>
 
 

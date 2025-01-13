@@ -308,6 +308,18 @@ const QualifiedLeads = () => {
   };
   // console.log('selectedLeadddd:',selectedLead)
   // // console.log('selectedLead.leadTimeline:',selectedLead.leadTimeline)
+
+  const calculateAgedDays = (leadEntryTime) => {
+    const entryTime = new Date(leadEntryTime);
+    const currentTime = new Date();
+    const diffInMilliseconds = currentTime - entryTime;
+  
+    const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+    const diffInHours = Math.floor((diffInMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  
+    return `Aged Days: ${diffInDays} days, ${diffInHours} hours`;
+  };
+
   return (
     <div className="p-6 relative text-sm font-thin">
       <div className="flex justify-between items-center mb-2">
@@ -368,6 +380,7 @@ const QualifiedLeads = () => {
               </button>
             </div>
           )}
+          <div className=" overflow-x-auto mt-4 max-h-[50vh] overflow-y-auto scrollbar-thin">
           <table className="table-auto w-[100%] border-collapse border border-gray-200">
             <thead className=" bg-gray-100">
               <tr className="">
@@ -412,6 +425,8 @@ const QualifiedLeads = () => {
               </tr>
             </thead>
             <tbody className="bg-white">
+              {console.log('qualifiedLeads in tbody:',qualifiedLeads)}
+              {/* {console.log('qualifiedLeads in tbody:',qualifiedLeads.leadEntryTime)} */}
               {qualifiedLeads.map((row) => (
                 <tr key={`${row.id}-${row.stage}`}>
                   <td className="shadow-sm px-1 py-0 w-10">
@@ -436,7 +451,7 @@ const QualifiedLeads = () => {
 
                   <td
                     onClick={() => viewLead(row.id)}
-                    className=" shadow-sm px-1 py-0.5 cursor-pointer"
+                    className=" shadow-sm px-1 py-0.5 cursor-pointer  "
                   >
                     {/* <div className="flex items-center justify-left gap-2 cursor-pointer">
                     {row.leadIsItemAdded && (
@@ -444,7 +459,17 @@ const QualifiedLeads = () => {
                     )}
                     {row.lead}
                     </div> */}
+
+                    <div className="flex items-end text-left justify-between  w-auto">
+                    <div>
                     {row.lead}
+                    </div>
+
+                    <div className="text-xs font-thin bg-gray-400 px-0.5 rounded-lg text-white">
+                    {/* <div className="text-xs font-thin"> */}
+                    {calculateAgedDays(row.leadEntryTime)}
+                    </div>
+                    </div>
                   </td>
 
                   <td
@@ -483,6 +508,7 @@ const QualifiedLeads = () => {
               ))}
             </tbody>
           </table>
+          </div>
 
           <Drawer
             showDrawer={showDrawer}

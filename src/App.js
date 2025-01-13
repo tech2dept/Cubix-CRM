@@ -16,6 +16,8 @@ function App() {
 
   const [isSidebarOpen,setIsSidebarOpen]=useState(false)
 
+  const [rowsPerPage, setRowsPerPage]=useState('5')
+  
   const toggleSidebar=()=>{
     setIsSidebarOpen(!isSidebarOpen)
   }
@@ -23,11 +25,11 @@ function App() {
   return (
     <Router>
 
-      <div className="flex h-screen  ">
+      <div className="flex h-screen max-h-[100vh] overflow-y-auto scrollbar-thin  ">
         
         <Sidebar isOpen={isSidebarOpen} />
 
-        <div className="flex-1 flex flex-col h-screen bg-blue-400">
+        <div className="flex-1 flex flex-col h-screen bg-blue-400 ">
           <Header toggleSidebar={toggleSidebar}/>
 
             <main className="flex-1  px-6 ml-16 pt-24" style={{ backgroundColor: '#f8f8f8 ' }}>
@@ -36,11 +38,11 @@ function App() {
                 <Route path="/qualifiedLeads" element={<QualifiedLeads />}></Route>
                 <Route path="/contacts" element={<Contacts />}></Route>
                 <Route path="/emails" element={<Emails />}></Route>
-                <Route path="/settings" element={<Settings />}></Route>
+                <Route path="/settings" element={<Settings rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />}></Route>
                 <Route path="/leadForm" element={<LeadForm />}></Route>
                 <Route path="/allEntriesForm" element={<AllEntriesForm />}></Route>
                 <Route path="/home" element={<Home />}></Route>
-                <Route path="/deals" element={<Deals />}></Route>
+                <Route path="/deals" element={<Deals rowsPerPage={rowsPerPage} />}></Route>
               </Routes>      
             </main>
         

@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
 import products from "../utils/products.png";
 
 import LeadStatusModal from "../modals/LeadStatusModal";
 import LeadDeleteModal from "../modals/LeadDeleteModal";
 import LeadSelectModal from "../modals/LeadSelectModal";
+import LeadFilterModal from "../modals/LeadFilterModal";
 import filter from "../utils/filter.png";
+
+
+import { DataGrid } from "@mui/x-data-grid";
+import { Box, Button } from "@mui/material";
 
 const TableComponent = ({ rows, setRows }) => {
   console.log("rows in table", rows);
@@ -20,6 +25,7 @@ const TableComponent = ({ rows, setRows }) => {
 
   const [searchTerm, setSearchTerm] = useState(""); // Search term state
   const [filteredRows, setFilteredRows] = useState(rows);
+  const tableEndRef = useRef(null);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -68,20 +74,46 @@ const TableComponent = ({ rows, setRows }) => {
     JSON.parse(localStorage.getItem("qualifiedLeads")) || [] // Initialize from localStorage if available
   );
 
-  const addBlankRow = () => {
-    const blankRow = {
-      // id: rows.length + 1, // Unique ID for the new row
-      id: Date.now(), // Unique ID for the new row
-      lead: "",
-      status: "",
-      organization: "",
-      title: "",
-      email: "",
-      phone: "",
-      notes: "",
-    };
-    setRows([...rows, blankRow]); // Add the blank row to the table
-  };
+  // const addBlankRow = () => {
+    // const blankRow = {
+    // id: rows.length + 1, // Unique ID for the new row
+    //   id: Date.now(), // Unique ID for the new row
+    //   lead: "",
+    //   status: "",
+    //   organization: "",
+    //   title: "",
+    //   email: "",
+    //   phone: "",
+    //   notes: "",
+    // };
+    // setRows([...rows, blankRow]); // Add the blank row to the table
+
+    const addBlankRow = () => {
+      const newRow = {
+        id: Date.now(),
+        lead: "",
+        status: "newLead",
+        organization: "",
+        title: "",
+        email: "",
+        phone: "",
+        notes: "",
+      };
+    
+  // Add the new row to the table by updating the state
+  // setRows((prevRows) => {
+    // const updatedRows = [...prevRows, newRow]; // Create the updated rows array
+    // localStorage.setItem("rows", JSON.stringify(updatedRows)); // Update localStorage
+    // return updatedRows; // Return the updated rows state
+  // });
+
+  setRows((prevRows)=>[...prevRows,newRow])
+
+  // Optionally, scroll to the end of the table after adding the row
+  // setTimeout(() => {
+  //   tableEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, 0);
+};
 
   const statusMapping = {
     newLead: "New Lead",
@@ -156,6 +188,7 @@ const TableComponent = ({ rows, setRows }) => {
 
   // Handle Delete - Removes selected rows from the list
   const handleDelete = (selectedRows) => {
+    console.log("handleDelete from table", selectedRows);
     // Filter out the selected rows from the 'rows' state
     const updatedRows = rows.filter((row) => !selectedRows.includes(row.id));
 
@@ -263,22 +296,129 @@ const TableComponent = ({ rows, setRows }) => {
   };
 
   // Update filteredRows whenever the search term changes
+  // const handleSearch = (term) => {
+  //   setSearchTerm(term);
+  //   const lowercasedTerm = term.toLowerCase();
+  //   setFilteredRows(
+  //     rows.filter(
+  //       (row) =>
+  //         row.lead.toLowerCase().includes(lowercasedTerm) ||
+  //         row.status.toLowerCase().includes(lowercasedTerm) ||
+  //         row.organization.toLowerCase().includes(lowercasedTerm) ||
+  //         row.title.toLowerCase().includes(lowercasedTerm) ||
+  //         row.email.toLowerCase().includes(lowercasedTerm) ||
+  //         row.phone.toLowerCase().includes(lowercasedTerm) ||
+  //         row.notes.toLowerCase().includes(lowercasedTerm)
+  //     )
+  //   );
+  // };
+
   const handleSearch = (term) => {
     setSearchTerm(term);
-    const lowercasedTerm = term.toLowerCase();
-    setFilteredRows(
-      rows.filter(
-        (row) =>
-          row.lead.toLowerCase().includes(lowercasedTerm) ||
-          row.status.toLowerCase().includes(lowercasedTerm) ||
-          row.organization.toLowerCase().includes(lowercasedTerm) ||
-          row.title.toLowerCase().includes(lowercasedTerm) ||
-          row.email.toLowerCase().includes(lowercasedTerm) ||
-          row.phone.toLowerCase().includes(lowercasedTerm) ||
-          row.notes.toLowerCase().includes(lowercasedTerm)
-      )
+    if (term.trim() === "") {
+      setFilteredRows(rows);
+    } else {
+      setFilteredRows(
+        rows.filter((row) =>
+          Object.values(row)
+            .join(" ")
+            .toLowerCase()
+            .includes(term.toLowerCase())
+        )
+      );
+    }
+  };
+
+  const updateRow = (id, field, value) => {
+    setRows((prevRows) =>
+      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+    );
+    setFilteredRows((prevRows) =>
+      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
     );
   };
+
+
+  ////////////////////////////////////////////////////////////////
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "newLead":
+        return "bg-orange-400";
+      case "contacted":
+        return "bg-blue-600";
+      case "attemptedToContact":
+        return "bg-red-400";
+      case "qualified":
+        return "bg-green-400";
+      case "unQualified":
+        return "bg-red-600";
+      default:
+        return "bg-gray-300";
+    }
+  };
+
+  // Define DataGrid columns
+  const columns = [
+    {
+      field: "select",
+      headerName: "",
+      sortable: false,
+      width: 50,
+      renderCell: (params) => (
+        <input
+          type="checkbox"
+          checked={selectedRows.includes(params.row.id)}
+          onChange={() => {
+            setSelectedRows((prev) =>
+              prev.includes(params.row.id)
+                ? prev.filter((id) => id !== params.row.id)
+                : [...prev, params.row.id]
+            );
+          }}
+        />
+      ),
+    },
+    { field: "lead", headerName: "Lead", flex: 1 },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      renderCell: (params) => (
+        <Button
+          style={{
+            width: "100%",
+            color: "white",
+            padding: "0.25rem",
+            borderRadius: "0.25rem",
+          }}
+          className={getStatusClass(params.value)}
+          onClick={() => console.log("Open Status Modal", params.row)}
+        >
+          {params.value}
+        </Button>
+      ),
+    },
+    { field: "organization", headerName: "Organization", flex: 1 },
+    { field: "title", headerName: "Title", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
+    { field: "phone", headerName: "Phone", flex: 1 },
+    { field: "notes", headerName: "Notes", flex: 1 },
+  ];
+
+
+  const calculateAgedDays = (leadEntryTime) => {
+    const entryTime = new Date(leadEntryTime);
+    const currentTime = new Date();
+    const diffInMilliseconds = currentTime - entryTime;
+  
+    const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+    const diffInHours = Math.floor((diffInMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  
+    return `Aged Days: ${diffInDays} days, ${diffInHours} hrs`;
+  };
+  
+
 
   return (
     <div className="m-2">
@@ -302,6 +442,7 @@ const TableComponent = ({ rows, setRows }) => {
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
           />
+
           {/* Search Icon */}
           <div className="absolute left-3  top-1/2 transform -translate-y-1/2 ">
             <AiOutlineSearch className="text-gray-500" />
@@ -331,117 +472,10 @@ const TableComponent = ({ rows, setRows }) => {
       </div>
 
       {/* Filter Modal */}
-      <div
-        id="filterModal"
-        className="hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center"
-        style={{ zIndex: 70 }}
-      >
-        <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-          {/* Modal Header */}
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold">Add Filters</h2>
-            <div className="flex space-x-4">
-              <button
-                onClick={resetFilters}
-                className="text-blue-500 hover:underline text-sm"
-              >
-                Clear All
-              </button>
-              <button
-                onClick={() =>
-                  document.getElementById("filterModal").classList.add("hidden")
-                }
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-
-          {/* Filters Section */}
-          <div className="space-y-4">
-            {/* Create Date */}
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-gray-700">Create Date</span>
-              <select className="text-gray-500 text-sm border border-gray-300 rounded px-2 py-1">
-                <option value="">Select</option>
-                <option value="today">Today</option>
-                <option value="last_week">Last Week</option>
-                <option value="last_month">Last Month</option>
-              </select>
-            </div>
-
-            {/* Last Activity Date */}
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-gray-700">Last Activity Date</span>
-              <select className="text-gray-500 text-sm border border-gray-300 rounded px-2 py-1">
-                <option value="">Select</option>
-                <option value="yesterday">Yesterday</option>
-                <option value="last_week">Last Week</option>
-                <option value="last_month">Last Month</option>
-              </select>
-            </div>
-
-            {/* Lead Status */}
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-gray-700">Lead Status</span>
-              <select className="text-gray-500 text-sm border border-gray-300 rounded px-2 py-1">
-                <option value="">Select</option>
-                <option value="open">Contacted</option>
-                <option value="closed">Qualified</option>
-                <option value="declined">Unqualified</option>
-              </select>
-            </div>
-
-            {/* Lead Source */}
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-gray-700">Lead Source</span>
-              <select className="text-gray-500 text-sm border border-gray-300 rounded px-2 py-1">
-                <option value="">Select</option>
-                <option value="email">Email</option>
-                <option value="phone">Phone</option>
-                <option value="website">Website</option>
-              </select>
-            </div>
-
-            {/* Coordinator */}
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-gray-700">Coordinator</span>
-              <select className="text-gray-500 text-sm border border-gray-300 rounded px-2 py-1">
-                <option value="">Select</option>
-                <option value="john_doe">John Doe</option>
-                <option value="jane_smith">Jane Smith</option>
-                <option value="mike_jones">Mike Jones</option>
-              </select>
-            </div>
-
-            {/* Advanced Filters */}
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-gray-700">Advanced Filters</span>
-              <select className="text-gray-500 text-sm border border-gray-300 rounded px-2 py-1">
-                <option value="">Select</option>
-                <option value="high_value">High Value</option>
-                <option value="recent_updates">Recently Updated</option>
-                <option value="priority">Priority</option>
-              </select>
-            </div>
-
-            {/* Sales By */}
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-gray-700">Sales By</span>
-              <select className="text-gray-500 text-sm border border-gray-300 rounded px-2 py-1">
-                <option value="">Select</option>
-                <option value="team_a">Team A</option>
-                <option value="team_b">Team B</option>
-                <option value="team_c">Team C</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+      <LeadFilterModal />
 
       <div>
-        <div className="overflow-x-auto mt-4">
+        <div className="overflow-x-auto mt-4 max-h-[50vh] overflow-y-auto scrollbar-thin">
           <table className="table-auto w-[100%] border-collapse border border-gray-200">
             <thead className="bg-gray-100">
               <tr>
@@ -483,47 +517,61 @@ const TableComponent = ({ rows, setRows }) => {
                 </th>
               </tr>
             </thead>
-
             <tbody className="bg-white">
               {/* {rows.map((row, index) => ( */}
               {filteredRows.map((row, index) => (
-                <tr
-                  key={`${row.id}-${index}`}
-                  className={` ${
-                    selectedRows.includes(row.id) ? "bg-blue-200" : ""
-                  }`} // Highlight row when selected
-                >
+                // <tr
+                //   key={`${row.id}-${index}`}
+                //   className={` ${
+                //     selectedRows.includes(row.id) ? "bg-blue-200" : ""
+                //   }`} // Highlight row when selected
+                // >
+
+                <tr key={row.id}>
                   <td className="shadow-sm px-1 py-0.5 text-center">
-                  
-                  <div className=" flex justify-right items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="rounded border border-sm"
-                      checked={selectedRows.includes(row.id)}
-                      onChange={() => {
-                        handleRowSelect(row.id); // Select/deselect the row
-                        if (!selectedRows.includes(row.id)) {
-                          openModal(row); // Open modal only if the row is selected
-                        } else {
-                          closeModal(); // Close modal if deselected
+                    <div className=" flex justify-right items-center gap-1.5">
+                      <input
+                        type="checkbox"
+                        className="rounded border border-sm"
+                        checked={selectedRows.includes(row.id)}
+                        // onChange={() => {
+                        //   handleRowSelect(row.id); // Select/deselect the row
+                        //   if (!selectedRows.includes(row.id)) {
+                        //     openModal(row); // Open modal only if the row is selected
+                        //   } else {
+                        //     closeModal(); // Close modal if deselected
+                        //   }
+                        // }}
+                        onChange={() =>
+                          setSelectedRows((prev) =>
+                            prev.includes(row.id)
+                              ? prev.filter((id) => id !== row.id)
+                              : [...prev, row.id]
+                          )
                         }
-                      }}
-
-                    />
-
-                    {row.leadIsItemAdded && (
-                      <img
-                        src={products}
-                        alt="products-icon"
-                        className="w-1 h-1 bg-green-500 text-xs p-1 rounded-lg"
                       />
-                    )}
+
+                      {row.leadIsItemAdded && (
+                        <img
+                          src={products}
+                          alt="products-icon"
+                          className="w-1 h-1 bg-green-500 text-xs p-1 rounded-lg"
+                        />
+                      )}
                     </div>
                   </td>
 
                   <td className=" shadow-sm px-1 py-0.5   ">
-                    <div className="flex items-center justify-left gap-2 cursor-pointer">
+                    <div className="flex items-start justify-between gap-2 cursor-pointer">
+                      <div>
                       {row.lead}
+                      </div>
+
+
+                      <div className="text-xs font-thin bg-gray-400 px-0.5 rounded-lg text-white">
+                      {calculateAgedDays(row.leadEntryTime)}
+                      </div>
+
                     </div>
                   </td>
                   <td
@@ -561,10 +609,27 @@ const TableComponent = ({ rows, setRows }) => {
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
+            </div>
 
-      {/* Modal for selecting lead  */}
+          {/* ///////////////////////////// */}
+
+          {/* <Box sx={{ height: 400, width: "100%" }}>
+            <DataGrid
+              rows={filteredRows}
+              columns={columns}
+              getRowId={(row) => row.id}
+              checkboxSelection={false} // We handle checkboxes manually
+              disableSelectionOnClick
+              density="compact"
+              hideFooter
+              onRowSelectionModelChange={(ids) => {
+                setSelectedRows(ids); // Update selected rows
+              }}
+            />
+          </Box> */}
+        </div>
+      {/* </div> */}
+
       {showModal && selectedLead && (
         <LeadSelectModal
           closeModal={closeModal}

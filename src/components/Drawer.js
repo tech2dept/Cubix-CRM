@@ -11,6 +11,7 @@ import {
 import ReactDOM from "react-dom";
 import attachfile from '../utils/attachfile.png'
 
+
 import CallIcon from "@mui/icons-material/Call";
 import { AiOutlinePhone } from "react-icons/ai";
 import EmailIcon from "@mui/icons-material/Email";
@@ -29,6 +30,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import ActivityLog from "./ActivityLog";
 import EscalateLead from "../modals/EscalateLead";
 import ProductsDetails from "./ProductsDetails";
+import QuoteLead from "../modals/QuoteLead";
 
 const Drawer = ({
   showDrawer,
@@ -84,6 +86,7 @@ const Drawer = ({
   };
   const [activitiesModal, setActivitiesModal] = useState(false);
   const [escalateModal, setEscalateModal] = useState(false);
+  const [quoteModal, setQuoteModal] = useState(false);
 
   const handleClose = () => setActivitiesModal(false);
   const handleCloseEscalate = () => setEscalateModal(false);
@@ -98,7 +101,10 @@ const Drawer = ({
 
   const [currentLead, setCurrentLead] = useState(null);
   const [currentLeadEscalate, setCurrentLeadEscalate] = useState(null);
-console.log('currentLead::',currentLead)
+  const [currentLeadQuote, setCurrentLeadQuote] = useState(null);
+
+
+  console.log('currentLead::',currentLead)
   const onActivities = (leadId) => {
     const selectedLeadScheduleActivity = leadId;
     setCurrentLead(selectedLeadScheduleActivity);
@@ -109,6 +115,12 @@ console.log('currentLead::',currentLead)
     const selectedLeadEscalateLead = leadId;
     setCurrentLeadEscalate(selectedLeadEscalateLead);
     setEscalateModal(true);
+  };
+
+  const onQuoteLead = (leadId) => {
+    const selectedLeadQuoteLead = leadId;
+    setCurrentLeadQuote(selectedLeadQuoteLead);
+    setQuoteModal(true);
   };
 
   const updateLeadActivityTimeline = (currentLead, activityEntry) => {
@@ -205,7 +217,7 @@ const [onProductTable,setOnProductTable] = useState(false)
   return (
     <div
       style={{ backgroundColor: "#f8f8f8 " }}
-      className={`fixed right-0 top-0 max-h-[100vh] w-1/2  shadow-lg z-50 p-3 overflow-y-auto transition-all duration-300 ease-in-out ${
+      className={`fixed right-0 top-0 max-h-[100vh] w-1/2  shadow-lg z-50 p-3 overflow-y-auto transition-all duration-300 ease-in-out max-h-[100vh] overflow-y-auto scrollbar-thin ${
         showDrawer ? "translate-x-0" : "translate-x-full"
       }`}
     >
@@ -259,7 +271,16 @@ const [onProductTable,setOnProductTable] = useState(false)
                 Escalate Lead
               </button>
 
-              {activitiesModal && selectedLead && (
+              <button
+                onClick={() => onQuoteLead(selectedLead.id)}
+                className=" flex items-center justify-center rounded-lg bg-blue-100 p-2 hover:bg-blue-200 text-blue-500"
+                aria-label="Address"
+              >
+                Quotes & Invoice
+              </button>
+
+              {activitiesModal && selectedLead && 
+                ReactDOM.createPortal(
                 <div className="fixed inset-0 z-50 flex items-center justify-center ">
                   <div className="relative z-100">
                     <ScheduleActivityPopup
@@ -268,10 +289,12 @@ const [onProductTable,setOnProductTable] = useState(false)
                       handleClose={handleClose}
                     />
                   </div>
-                </div>
+                </div>,
+                document.body 
               )}
 
-              {escalateModal && selectedLead && (
+              {escalateModal && selectedLead && 
+                  ReactDOM.createPortal (
                 <div className="fixed inset-0 z-50 flex items-center justify-center ">
                   <div className="relative z-100">
                     <EscalateLead
@@ -280,9 +303,29 @@ const [onProductTable,setOnProductTable] = useState(false)
                       handleClose={handleCloseEscalate}
                     />
                   </div>
-                </div>
-              )}
+                </div>,
+              document.body  
+              )
+              }
             </div>
+
+
+           
+
+              {quoteModal && selectedLead && 
+              ReactDOM.createPortal (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className=" rounded-lg  p-3  w-full mx-4" style={{background:"#f8f8f8"}}>
+      <QuoteLead isOpen={quoteModal} onClose={() => setQuoteModal(false)} selectedLead={selectedLead} productDetails={productDetails}/>
+                  </div>
+                </div>,
+            document.body  
+            )
+              }
+            </div>
+
+
+
 
             {/* Contact Details */}
             <div className="text-center text-gray-500 space-y-1">
@@ -303,12 +346,12 @@ const [onProductTable,setOnProductTable] = useState(false)
                   "46 Smith Street, Perth Amboy, NJ 0709"}
               </p> */}
             </div>
-          </div>
+          {/* </div> */}
 
           {/* Lead Info section  */}
-          <div className="flex gap-3 ">
+          <div className="flex gap-3 max-h-[80vh] overflow-y-auto scrollbar-thin ">
             {/* Form Section */}
-            <div className="formDiv  w-[40%]  bg-white p-4 rounded-md shadow-md max-h-[80vh] overflow-y-scroll">
+            <div className="formDiv  w-[40%]  bg-white p-4 rounded-md shadow-md max-h-[80vh] overflow-y-auto scrollbar-thin">
               <h3 className="text-xl font-semibold mb-4">Lead Info</h3>
               <form onSubmit={handleSave}>
                 <div className="mb-4">

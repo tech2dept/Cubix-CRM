@@ -5,7 +5,7 @@ import PaginationItem from '@mui/material/PaginationItem';
 import Stack from '@mui/material/Stack';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-const WonLeads = ({ rows, setRows }) => {
+const WonLeads = ({ rows, setRows ,rowsPerPage}) => {
 
 
   useEffect(() => {
@@ -120,7 +120,7 @@ const WonLeads = ({ rows, setRows }) => {
 
 
     const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 5; // Number of rows per page
+    // const rowsPerPage = rowsPerPage; // Number of rows per page
   
     // Calculate the rows to display on the current page
     const startIndex = (currentPage - 1) * rowsPerPage;

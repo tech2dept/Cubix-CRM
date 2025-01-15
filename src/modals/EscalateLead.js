@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 export default function EscalateLead({ lead, updateLeadActivityTimeline, handleClose }) {
   const [assignedTo, setAssignedTo] = useState("");
+  console.log('lead from escalate lead',lead)
 
   // Dummy data for assignees
   const dummyAssignees = [

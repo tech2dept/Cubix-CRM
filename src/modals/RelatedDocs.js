@@ -1,10 +1,19 @@
 import React, { useState } from "react";
 
-const RelatedDocs = () => {
+const RelatedDocs = ({ selectedLead }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null); // State for the selected file
+
+  console.log("selectedLead from related docs", selectedLead);
+  console.log("selectedLead from related docs2222", selectedLead.docs);
 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Get the first selected file
+    setSelectedFile(file); // Update the state
   };
 
   return (
@@ -28,20 +37,37 @@ const RelatedDocs = () => {
             {/* File Upload */}
             <input
               type="file"
+              onChange={handleFileChange} // Handle file change
               className="block w-full border border-gray-300 rounded px-2 py-1 text-sm"
             />
-            {/* Document Links */}
+            {/* Display Selected File */}
+            {selectedFile && (
+              <div className="mt-2 text-sm text-gray-700">
+                <p>
+                  <strong>Selected File:</strong> {selectedFile.name}
+                </p>
+              </div>
+            )}
+            {/* Display Documents */}
             <ul className="list-disc pl-5 text-sm text-gray-700">
-              <li>
-                <a href="#doc1" className="text-blue-500 hover:underline">
-                  Document1.pdf
-                </a>
-              </li>
-              <li>
-                <a href="#doc2" className="text-blue-500 hover:underline">
-                  Document2.pdf
-                </a>
-              </li>
+              {selectedLead.docs &&
+                selectedLead.docs
+                  .filter((doc) => doc instanceof File || doc instanceof Blob) // Filter only valid docs
+                  .map((doc, index) => (
+                    <li key={index}>
+                      <a
+                        href={URL.createObjectURL(doc)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        {doc.name}
+                      </a>
+                    </li>
+                  ))}
+              {(!selectedLead.docs || selectedLead.docs.length === 0) && (
+                <p className="text-gray-500">No documents attached.</p>
+              )}
             </ul>
           </div>
           <div className="flex justify-end gap-2 mt-4">

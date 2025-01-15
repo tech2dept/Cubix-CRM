@@ -43,7 +43,7 @@ const Drawer = ({
   rows,
   setRows,
 }) => {
- console.log("selectedLead in drawer:", selectedLead);
+//  console.log("selectedLead in drawer:", selectedLead);
 //  console.log("selectedLead in drawer:", selectedLead?.leadItemCode);
  
  
@@ -56,7 +56,7 @@ const Drawer = ({
    leadItemQuantity:selectedLead?.leadItemQuantity,
    leadItemUnit:selectedLead?.leadItemUnit,
   }]
-  console.log("productDetails in drawer:", productDetails);
+  // console.log("productDetails in drawer:", productDetails);
   // console.log("rows in drawer:", rows);
 
   const leadSourceMapping = {
@@ -102,9 +102,10 @@ const Drawer = ({
   const [currentLead, setCurrentLead] = useState(null);
   const [currentLeadEscalate, setCurrentLeadEscalate] = useState(null);
   const [currentLeadQuote, setCurrentLeadQuote] = useState(null);
+  const [leads, setLeads] = useState(null);
 
 
-  console.log('currentLead::',currentLead)
+  // console.log('currentLead::',currentLead)
   const onActivities = (leadId) => {
     const selectedLeadScheduleActivity = leadId;
     setCurrentLead(selectedLeadScheduleActivity);
@@ -183,16 +184,19 @@ const Drawer = ({
    // console.log("Updated Leads with File:", updatedLeads);
   };
   
-  const handleFileAttachment = (e, currentLead) => {
-    const file = e.target.files[0]; // Get the first file from the input
+  const handleFileAttachment = (event, lead) => {
+    const file = event.target.files[0]; // Get the selected file
     if (file) {
+      // Set file name for display
       setFileName(file.name);
-      addFileToLeadTimeline(currentLead, file);
-    } else {
-      setFileName("No file chosen"); 
-     // console.log("No file selected");
+
+      // Update the selectedLead.docs property (or append to the array if it's an array)
+      lead.docs = lead.docs ? [...lead.docs, file] : [file];
+
+      console.log("Updated selectedLead:", lead);
     }
   };
+  
 
 const [onProductTable,setOnProductTable] = useState(false)
    const handleProductTable=()=>{
@@ -217,7 +221,7 @@ const [onProductTable,setOnProductTable] = useState(false)
   return (
     <div
       style={{ backgroundColor: "#f8f8f8 " }}
-      className={`fixed right-0 top-0 max-h-[100vh] w-1/2  shadow-lg z-50 p-3 overflow-y-auto transition-all duration-300 ease-in-out max-h-[100vh] overflow-y-auto scrollbar-thin ${
+      className={`fixed right-0 top-0 max-h-[100vh] w-1/2  shadow-2xl z-50 p-3 overflow-y-auto transition-all duration-300 ease-in-out max-h-[100vh] overflow-y-auto scrollbar-thin ${
         showDrawer ? "translate-x-0" : "translate-x-full"
       }`}
     >
@@ -742,7 +746,7 @@ const [onProductTable,setOnProductTable] = useState(false)
                     type="file"
                     name="file"
                     // onChange={(e) => handleInputChange(e, "file")}
-                    onChange={(e) => handleFileAttachment(e, selectedLead.id)}
+                    onChange={(e) => handleFileAttachment(e, selectedLead)}
                     // className="rounded w-[90%] p-1"
                     className="hidden"
                   />

@@ -13,8 +13,6 @@ const Deals = ({rowsPerPage}) => {
         const savedLostData = localStorage.getItem("lostLeads")
         return savedLostData ? JSON.parse(savedLostData) : [];
       })
-
-      // const rowsPerPage='10'
   return (
     <div className='p-6 relative text-sm font-thin'>
     <h2 className='text-xl font-normal mb-2'>Deals</h2> 

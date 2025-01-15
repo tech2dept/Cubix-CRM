@@ -4,66 +4,67 @@ import MenuItem from "@mui/material/MenuItem";
 // import TableComponent from "./Table";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import ProductsInfo from "./ProductsInfo";
-import attachfile from '../utils/attachfile.png'
-import whatsapp from '../utils/whatsapp.png'
+import attachfile from "../utils/attachfile.png";
+import whatsapp from "../utils/whatsapp.png";
 
 const AllEntriesForm = ({ onFormSubmit }) => {
   const initialFormData = {
-    id: Date.now(),//
-    name: "",//
-    phone: "",//
-    alternatePhone: "",//
-    isPhoneWhatsApp: false,//
-    isAlternatePhoneWhatsApp: false,//
-    status: "",//
-    organization: "",//
-    title: "",//
-    email: "",//
-    notes: "",//
-    leadSource: "",//
-    campaignId: "",//
-    departmentNo: "",//
-    leadDateAndTimeEntry: "",//
-    probability: "",//
-    bookedAmount: "",//
-    territory: "",//
-    country: "",//
-    streetAddress: "",//
-    city: "",//
-    apartment: "",//
-    location: "",//
-    area: "",//
+    id: Date.now(), //
+    name: "", //
+    phone: "", //
+    alternatePhone: "", //
+    isPhoneWhatsApp: false, //
+    isAlternatePhoneWhatsApp: false, //
+    status: "", //
+    organization: "", //
+    title: "", //
+    email: "", //
+    notes: "", //
+    leadSource: "", //
+    coordinator: "general",
+    assignTo: "",
+    docs: "",
+    campaignId: "", //
+    departmentNo: "", //
+    leadDateAndTimeEntry: "", //
+    probability: "", //
+    bookedAmount: "", //
+    territory: "", //
+    country: "", //
+    streetAddress: "", //
+    city: "", //
+    apartment: "", //
+    location: "", //
+    area: "", //
     // priority: "",//
     leadEntryTime: "",
     timeline: "",
-    isItemAdded:'',
-    itemCode:'',
-    itemDescription:'',
-    itemUnit:'',
-    itemCurrentStock:'',
-    itemQuantity:'',
-    itemPrice:'',
-    itemAmount:'',
-
-
+    isItemAdded: "",
+    itemCode: "",
+    itemDescription: "",
+    itemUnit: "",
+    itemCurrentStock: "",
+    itemQuantity: "",
+    itemPrice: "",
+    itemAmount: "",
 
     // "CmpCode": null,
     // "mode": null,
     // "alternateEmail": null,
-  //   "SalesPerson": null,
-  //   "TeamID": null,
-  //   "Coordinator": null,
-  //   "Comments": null,
-  //   "CampaignId": null,
-  //   "CreatedBy": null,
-  //   "deptno": null,
-  //   "Prod_code": null,
-  //   "Prod_Description": null,
-  //   "Prod_Unit": null,
-  //   "Prod_Qty": null,
-  //   "Prod_Price": null,
-  //   "Prod_Amount": null,
-  //   "Prod_Comments": null
+    //   "SalesPerson": null,
+    //   "TeamID": null,
+    //   "Coordinator": null,
+    //   "Comments": null,
+    //   "CampaignId": null,
+    //   "CreatedBy": null,
+    //   "deptno": null,
+    //   "Prod_code": null,
+    //   "Prod_Description": null,
+    //   "Prod_Unit": null,
+    //   "Prod_Qty": null,
+    //   "Prod_Price": null,
+    //   "Prod_Amount": null,
+    //   "Prod_Comments": null
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -78,67 +79,64 @@ const AllEntriesForm = ({ onFormSubmit }) => {
   //       setFormData(savedData);
   //     }
   //   }, []);
-  const [fileName , setFileName] = useState('No file chosen')
+  const [fileName, setFileName] = useState("No file chosen");
 
-const handleChange = (e) => {
-  const { name, value, type, files } = e.target;
+  const handleChange = (e) => {
+    const { name, value, type, files } = e.target;
 
-  if (type === "file") {
-    const file = files?.[0]; // Safely access the first file
-    if (file) {
-      setFileName(file.name); // Update the state with the file name
+    if (type === "file") {
+      const file = files?.[0]; // Safely access the first file
+      if (file) {
+        setFileName(file.name); // Update the state with the file name
+      } else {
+        setFileName("No file chosen"); // Reset if no file is selected
+      }
     } else {
-      setFileName("No file chosen"); // Reset if no file is selected
+      setFormData({
+        ...formData,
+        [name]: name === "territory" ? value.toLowerCase() : value,
+      });
     }
-  } else {
-    setFormData({
-      ...formData,
-      [name]: name === "territory" ? value.toLowerCase() : value,
-    });
-  }
-};
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-
-
-    
     const currentTimestamp = new Date().toISOString(); // Get the current timestamp
     // const formDataWithTimestamp = { ...formData, leadEntryTime: currentTimestamp };
-    const formDataWithTimestamp = { ...formData, leadEntryTime: currentTimestamp ,
+    const formDataWithTimestamp = {
+      ...formData,
+      leadEntryTime: currentTimestamp,
       timeline: [
-      {
-        date: currentTimestamp,
-        activity: "Lead created",
-      },
-    ], };
+        {
+          date: currentTimestamp,
+          activity: "Lead created",
+        },
+      ],
+    };
 
-    console.log("Form Data with Lead Entry Time and timeline formDataWithTimestamp: ", formDataWithTimestamp);
-    
+    console.log(
+      "Form Data with Lead Entry Time and timeline formDataWithTimestamp: ",
+      formDataWithTimestamp
+    );
+
     // productEntryInAllEntries()
-    console.log('formDataWithTimestamp::::',formDataWithTimestamp)
+    console.log("formDataWithTimestamp::::", formDataWithTimestamp);
     onFormSubmit(formDataWithTimestamp);
     alert("Form Data Submitted Succesfully!");
     setFormData(initialFormData);
   };
 
-
-
-
-
-
   const productEntryInAllEntries = (productEntryTimeline) => {
     console.log("productEntryTimeline from all entries:", productEntryTimeline);
-  
+
     // Ensure productEntryTimeline has data and extract the first entry
-    const productFormData = productEntryTimeline && productEntryTimeline[0] 
-      ? productEntryTimeline[0] 
-      : {};
-  
+    const productFormData =
+      productEntryTimeline && productEntryTimeline[0]
+        ? productEntryTimeline[0]
+        : {};
+
     console.log("productFormData:", productFormData);
-
-
 
     const isProductAdded = !!(
       productFormData.itemCode ||
@@ -149,15 +147,12 @@ const handleChange = (e) => {
       productFormData.itemPrice ||
       productFormData.itemAmount
     );
-  
-    console.log('isProductAdded ::  :',isProductAdded)
 
-
-
+    console.log("isProductAdded ::  :", isProductAdded);
 
     setFormData((prevFormData) => ({
       ...prevFormData,
-      isItemAdded:isProductAdded,
+      isItemAdded: isProductAdded,
       itemCode: productFormData.itemCode || "",
       itemDescription: productFormData.itemDescription || "",
       itemUnit: productFormData.itemUnit || "",
@@ -167,7 +162,6 @@ const handleChange = (e) => {
       itemAmount: productFormData.itemAmount || "",
     }));
   };
-
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -181,10 +175,9 @@ const handleChange = (e) => {
     setFormData({ ...formData, priority: level });
   };
 
-
-  const onAddProduct =()=>{
-    setAddProduct(true)
-  }
+  const onAddProduct = () => {
+    setAddProduct(true);
+  };
 
   return (
     <div className="flex  justify-center items-center ">
@@ -272,42 +265,38 @@ const handleChange = (e) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label={<img src={whatsapp} alt="whatsapp-icon" className="w-5 h-5" />}
+                label={
+                  <img src={whatsapp} alt="whatsapp-icon" className="w-5 h-5" />
+                }
                 sx={{
                   marginLeft: 2,
                   color: "rgba(0, 0, 0, 0.6)",
                   borderRadius: "16px",
-                  
                 }}
               />
             </div>
           </div>
 
           <div className="flex justify-between items-center">
-          <div className="mb-0 w-[70%]">
-  <TextField
-    label="Alternate Phone"
-    name="alternatePhone"
-    type="number"
-    value={formData.alternatePhone}
-    onChange={handleChange}
-    placeholder="Enter Alternate Phone Number"
-    fullWidth
-    variant="standard"
-    id="standard"
-    sx={{
-      "& .MuiInputLabel-root": {
-        fontFamily: "Figtree, sans-serif", // Apply Figtree font
-      },
-      "& .MuiInputLabel-root.Mui-focused": {
-        color: "inherit", // Prevent the label from turning blue
-      },
-      "& .MuiInput-root::after": {
-        borderBottomColor: "transparent", // Remove blue underline
-      },
-    }}
-  />
-</div>
+            <div className="mb-0 w-[70%]">
+              <TextField
+                label="Alternate Phone"
+                name="alternatePhone"
+                type="number"
+                value={formData.alternatePhone}
+                onChange={handleChange}
+                placeholder="Enter Alt Phone Number"
+                fullWidth
+                variant="standard"
+                id="standard"
+                sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Figtree, sans-serif",
+                  },
+                  width: "100%",
+                }}
+              />
+            </div>
             <div>
               <FormControlLabel
                 control={
@@ -317,10 +306,13 @@ const handleChange = (e) => {
                     onChange={handleCheckboxChange}
                   />
                 }
-                label={<img src={whatsapp} alt="whatsapp-icon" className="w-5 h-5" />}
+                label={
+                  <img src={whatsapp} alt="whatsapp-icon" className="w-5 h-5" />
+                }
                 sx={{
                   marginLeft: 2,
                   color: "rgba(0, 0, 0, 0.6)",
+                  borderRadius: "16px",
                 }}
               />
             </div>
@@ -462,7 +454,35 @@ const handleChange = (e) => {
 
           <div className="mb-0">
             <TextField
-            key={formData.campaignId}
+              select
+              label="Coordinator"
+              name="coordinator"
+              value={formData.coordinator}
+              onChange={handleChange}
+              fullWidth
+              variant="standard"
+              id="standard"
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Figtree, sans-serif", // Force Figtree font for label
+                },
+              }}
+            >
+              <MenuItem value="" disabled>
+                Select Coordinator
+              </MenuItem>
+              <MenuItem value="general">General</MenuItem>
+              <MenuItem value="coordinatorA">Coordinator A</MenuItem>
+              <MenuItem value="coordinatorB">Coordinator B</MenuItem>
+              <MenuItem value="coordinatorC">Coordinator C</MenuItem>
+              <MenuItem value="coordinatorD">Coordinator D</MenuItem>
+              <MenuItem value="coordinatorE">Coordinator E</MenuItem>
+            </TextField>
+          </div>
+
+          <div className="mb-0">
+            <TextField
+              key={formData.campaignId}
               select
               label="Campaign ID"
               name="campaignId"
@@ -477,55 +497,50 @@ const handleChange = (e) => {
                 },
               }}
             >
-    <MenuItem value="" disabled>
-      Select Campaign
-    </MenuItem>
-    <MenuItem value="cmp001">Social Media Campaign</MenuItem>
-    <MenuItem value="cmp002">Google Ads Campaign</MenuItem>
-    <MenuItem value="cmp003">Email Marketing Campaign</MenuItem>
-    <MenuItem value="cmp004">Referral Campaign</MenuItem>
-    <MenuItem value="cmp005">Event Promotion Campaign</MenuItem>
-    <MenuItem value="cmp006">Content Marketing Campaign</MenuItem>
-    <MenuItem value="cmp007">SEO Campaign</MenuItem>
-    <MenuItem value="cmp008">Direct Mail Campaign</MenuItem>
-  </TextField>
-</div>
+              <MenuItem value="" disabled>
+                Select Campaign
+              </MenuItem>
+              <MenuItem value="cmp001">Social Media Campaign</MenuItem>
+              <MenuItem value="cmp002">Google Ads Campaign</MenuItem>
+              <MenuItem value="cmp003">Email Marketing Campaign</MenuItem>
+              <MenuItem value="cmp004">Referral Campaign</MenuItem>
+              <MenuItem value="cmp005">Event Promotion Campaign</MenuItem>
+              <MenuItem value="cmp006">Content Marketing Campaign</MenuItem>
+              <MenuItem value="cmp007">SEO Campaign</MenuItem>
+              <MenuItem value="cmp008">Direct Mail Campaign</MenuItem>
+            </TextField>
+          </div>
 
-
-
-
-
-<div className="mb-0">
-  <TextField
-    select
-    key={formData.departmentNo}
-    label="Department No"
-    name="departmentNo"
-    value={formData.departmentNo}
-    onChange={handleChange}
-    fullWidth
-    variant="standard"
-    id="standard"
-    sx={{
-      "& .MuiInputLabel-root": {
-        fontFamily: "Figtree, sans-serif", // Force Figtree font for label
-      },
-    }}
-  >
-    <MenuItem value="" disabled>
-      Select Department
-    </MenuItem>
-    <MenuItem value="dept101">Sales</MenuItem>
-    <MenuItem value="dept102">Marketing</MenuItem>
-    <MenuItem value="dept103">Customer Support</MenuItem>
-    <MenuItem value="dept104">IT</MenuItem>
-    <MenuItem value="dept105">Finance</MenuItem>
-    <MenuItem value="dept106">HR</MenuItem>
-    <MenuItem value="dept107">Logistics</MenuItem>
-    <MenuItem value="dept108">R&D</MenuItem>
-  </TextField>
-</div>
-
+          <div className="mb-0">
+            <TextField
+              select
+              key={formData.departmentNo}
+              label="Department No"
+              name="departmentNo"
+              value={formData.departmentNo}
+              onChange={handleChange}
+              fullWidth
+              variant="standard"
+              id="standard"
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Figtree, sans-serif", // Force Figtree font for label
+                },
+              }}
+            >
+              <MenuItem value="" disabled>
+                Select Department
+              </MenuItem>
+              <MenuItem value="dept101">Sales</MenuItem>
+              <MenuItem value="dept102">Marketing</MenuItem>
+              <MenuItem value="dept103">Customer Support</MenuItem>
+              <MenuItem value="dept104">IT</MenuItem>
+              <MenuItem value="dept105">Finance</MenuItem>
+              <MenuItem value="dept106">HR</MenuItem>
+              <MenuItem value="dept107">Logistics</MenuItem>
+              <MenuItem value="dept108">R&D</MenuItem>
+            </TextField>
+          </div>
 
           <div className="mb-0">
             <TextField
@@ -552,52 +567,52 @@ const handleChange = (e) => {
           </div>
 
           <div className="mb-4 flex items-center space-x-4">
-  {/* Currency Selector */}
-  <TextField
-    select
-    label="Currency"
-    name="currency"
-    value={formData.currency || ""} // Separate state for currency
-    onChange={handleChange}
-    variant="standard"
-    sx={{
-      width: "100px",
-      "& .MuiInputLabel-root": {
-        fontFamily: "Figtree, sans-serif",
-      },
-    }}
-  >
-    <MenuItem value="AED">AED</MenuItem>
-    <MenuItem value="USD">USD</MenuItem>
-    <MenuItem value="EUR">EUR</MenuItem>
-    <MenuItem value="GBP">GBP</MenuItem>
-    <MenuItem value="INR">INR</MenuItem>
-    <MenuItem value="JPY">JPY</MenuItem>
-    <MenuItem value="AUD">AUD</MenuItem>
-  </TextField>
+            {/* Currency Selector */}
+            <TextField
+              select
+              label="Currency"
+              name="currency"
+              value={formData.currency || ""} // Separate state for currency
+              onChange={handleChange}
+              variant="standard"
+              sx={{
+                width: "100px",
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Figtree, sans-serif",
+                },
+              }}
+            >
+              <MenuItem value="AED">AED</MenuItem>
+              <MenuItem value="USD">USD</MenuItem>
+              <MenuItem value="EUR">EUR</MenuItem>
+              <MenuItem value="GBP">GBP</MenuItem>
+              <MenuItem value="INR">INR</MenuItem>
+              <MenuItem value="JPY">JPY</MenuItem>
+              <MenuItem value="AUD">AUD</MenuItem>
+            </TextField>
 
-  {/* Booked Amount */}
-  <TextField
-    label="Booked Amount"
-    name="bookedAmount"
-    type="number"
-    value={formData.bookedAmount || ""} // Separate state for booked amount
-    onChange={handleChange}
-    fullWidth
-    variant="standard"
-    InputProps={{
-      inputProps: { min: 0 }, // Prevent negative amounts
-    }}
-    InputLabelProps={{
-      shrink: true,
-    }}
-    sx={{
-      "& .MuiInputLabel-root": {
-        fontFamily: "Figtree, sans-serif",
-      },
-    }}
-  />
-</div>
+            {/* Booked Amount */}
+            <TextField
+              label="Booked Amount"
+              name="bookedAmount"
+              type="number"
+              value={formData.bookedAmount || ""} // Separate state for booked amount
+              onChange={handleChange}
+              fullWidth
+              variant="standard"
+              InputProps={{
+                inputProps: { min: 0 }, // Prevent negative amounts
+              }}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Figtree, sans-serif",
+                },
+              }}
+            />
+          </div>
 
           <div className="mb-0">
             <TextField
@@ -717,25 +732,6 @@ const handleChange = (e) => {
 
           <div className="mb-0">
             <TextField
-              label="Location"
-              name="location"
-              type="text"
-              value={formData.location}
-              onChange={handleChange}
-              placeholder="Enter lead Location"
-              fullWidth
-              variant="standard"
-              id="standard"
-              sx={{
-                "& .MuiInputLabel-root": {
-                  fontFamily: "Figtree, sans-serif", // Force Figtree font for label
-                },
-              }}
-            />
-          </div>
-
-          <div className="mb-0">
-            <TextField
               label="Area Name"
               name="area"
               type="text"
@@ -753,9 +749,30 @@ const handleChange = (e) => {
             />
           </div>
 
+          
+
+          <div className="mb-0">
+            <TextField
+              label="Location"
+              name="location"
+              type="text"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="Enter lead Location"
+              fullWidth
+              variant="standard"
+              id="standard"
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Figtree, sans-serif", // Force Figtree font for label
+                },
+              }}
+            />
+          </div>
 
 
-{/* <div className="my-4 flex items-center justify-center gap-4 ">
+
+          {/* <div className="my-4 flex items-center justify-center gap-4 ">
  
   <label className="block font-medium text-black text-opacity-60">
     Attach File
@@ -782,7 +799,7 @@ const handleChange = (e) => {
     </p>
 </div>  */}
 
-{/* 
+          {/* 
 <div className="my-4  flex items-center justify-between">
             <label className="block font-medium mb-2 text-black text-opacity-60">
               Attach File
@@ -795,15 +812,14 @@ const handleChange = (e) => {
             />
           </div> */}
 
-
-{/* <div className="bg-green-200 flex "> */}
+          {/* <div className="bg-green-200 flex "> */}
           {/* Priority Selection */}
-          <div className=" flex gap-4 items-center justify-left mt-4 " >
+          <div className=" flex gap-4 items-center justify-left mt-4 ">
             <label className="block font-medium  text-black text-opacity-90">
               Priority
             </label>
             <div className="flex space-x-2">
-              {[1, 2, 3].map((level,index) => (
+              {[1, 2, 3].map((level, index) => (
                 <button
                   key={`${level}-${index}`}
                   type="button"
@@ -820,31 +836,32 @@ const handleChange = (e) => {
             </div>
           </div>
 
-<div></div>
-<div></div>
-<div className=" flex gap-4 items-center justify-end mt-4 " >
-<div></div>
-<div>
+          {/* <div></div> */}
+          <div></div>
+          <div className=" flex gap-4 items-center justify-end mt-4 ">
 
-          <button
-          type="button"
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
-          onClick={onAddProduct}
-          >
-          Add Product
-        </button>
-</div>
-</div>
-{/* </div> */}
+            <div>
+              <button
+                type="button"
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+                onClick={onAddProduct}
+              >
+                Add Product
+              </button>
+            </div>
+          </div>
+          {/* </div> */}
           {/* <br></br> */}
-
         </div>
-{ addProduct &&
-<ProductsInfo lead={formData.name}  productEntryInAllEntries={productEntryInAllEntries} onAddProducts={addProduct} />
-}
+        {addProduct && (
+          <ProductsInfo
+            lead={formData.name}
+            productEntryInAllEntries={productEntryInAllEntries}
+            onAddProducts={addProduct}
+          />
+        )}
 
-
-        <div className="flex justify-center pt-2 pb-0  " >
+        <div className="flex justify-center pt-2 pb-0  ">
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 my-2 rounded w-40"
